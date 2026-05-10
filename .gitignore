@@ -1,0 +1,61 @@
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+
+# Logs
+*.log
+*.tmp
+*.temp
+
+# Dart
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+
+# Generated
+**/*.freezed.dart
+**/generated_plugin_registrant.dart
+**/*.g.dart
+
+# Android
+android/.gradle/
+android/local.properties
+android/app/build/
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/.last_build_id
+
+# macOS
+macos/Pods/
+
+# Windows
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
+
+# Linux
+linux/flutter/generated_plugin_registrant.cc
+
+# IDE
+.vscode/
+.idea/
+.codex
+*.iml
+
+# System
+.DS_Store
+Thumbs.db
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+firebase.json
+
+# Env
+.env
+
+# AI Context
+ai_context/
