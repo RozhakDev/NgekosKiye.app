@@ -7,6 +7,10 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/otp_screen.dart';
 
+import '../../features/kost/presentation/screens/dashboard_screen.dart';
+import '../../features/kost/presentation/screens/kost_detail_screen.dart';
+import '../../features/kost/presentation/screens/kost_map_screen.dart';
+
 final authStateProvider = StateProvider<bool>((ref) => false);
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -26,7 +30,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const PlaceholderScreen(title: 'Katalog Kost (Home)'),
+        builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
         path: '/login',
@@ -42,6 +46,28 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           final email = state.extra as String? ?? '';
           return OtpScreen(email: email);
         },
+      ),
+      GoRoute(
+        path: '/kost/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return KostDetailScreen(id: id);
+        },
+      ),
+      GoRoute(
+        path: '/map',
+        builder: (context, state) {
+          final args = state.extra as Map<String, dynamic>;
+          return KostMapScreen(
+            lat: double.parse(args['lat'].toString()),
+            lng: double.parse(args['lng'].toString()),
+            title: args['name'],
+          );
+        },
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const Scaffold(body: Center(child: Text('Profile Screen - Pending'))),
       ),
     ],
   );
