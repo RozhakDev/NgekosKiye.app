@@ -65,10 +65,23 @@ class KostDetailScreen extends ConsumerWidget {
                     const Text('KAMAR TERSEDIA', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
                     const SizedBox(height: 16),
                     ...(kost.rooms ?? []).map((room) => ListTile(
+                          onTap: room.status == 'available' ? () {
+                            context.push('/booking/${room.id}', extra: {
+                              'kostId': kost.id,
+                              'roomPrice': double.parse(room.price)
+                            });
+                          } : null,
                           contentPadding: EdgeInsets.zero,
                           title: Text('Kamar ${room.roomNumber}'),
                           subtitle: Text(room.status.toUpperCase(), style: TextStyle(color: room.status == 'available' ? Colors.green : AppColors.error, fontSize: 12)),
-                          trailing: Text(CurrencyFormatter.toIDR(room.price), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(CurrencyFormatter.toIDR(room.price), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.chevron_right, size: 20),
+                            ],
+                          ),
                         )),
                   ],
                 ),
@@ -79,16 +92,26 @@ class KostDetailScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (err, stack) => Center(child: Text('Gagal memuat detail: $err')),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton(
-            onPressed: () {
-              context.push('/booking/$id');
-            },
-            child: const Text('PESAN SEKARANG'),
-          ),
-        ),
+      bottomNavigationBar: detailAsyncValue.maybeWhen(
+        data: (kost) {
+          if (kost.rooms == null || kost.rooms!.isEmpty) return null;
+          final room = kost.rooms!.first;
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  context.push('/booking/${room.id}', extra: {
+                    'kostId': kost.id,
+                    'roomPrice': double.parse(room.price)
+                  });
+                },
+                child: const Text('PESAN SEKARANG'),
+              ),
+            ),
+          );
+        },
+        orElse: () => null,
       ),
     );
   }

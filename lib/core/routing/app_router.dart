@@ -11,6 +11,9 @@ import '../../features/kost/presentation/screens/dashboard_screen.dart';
 import '../../features/kost/presentation/screens/kost_detail_screen.dart';
 import '../../features/kost/presentation/screens/kost_map_screen.dart';
 
+import '../../features/booking/presentation/screens/booking_screen.dart';
+import '../../features/booking/presentation/screens/payment_screen.dart';
+
 final authStateProvider = StateProvider<bool>((ref) => false);
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -68,6 +71,26 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const Scaffold(body: Center(child: Text('Profile Screen - Pending'))),
+      ),
+      GoRoute(
+        path: '/booking/:roomId',
+        builder: (context, state) {
+          final roomId = int.parse(state.pathParameters['roomId']!);
+          final args = state.extra as Map<String, dynamic>;
+          return BookingScreen(
+            roomId: roomId,
+            kostId: args['kostId'],
+            roomPrice: args['roomPrice'],
+          );
+        },
+      ),
+      GoRoute(
+        path: '/payment/:bookingId/:kostId',
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          final kostId = int.parse(state.pathParameters['kostId']!);
+          return PaymentScreen(bookingId: bookingId, kostId: kostId);
+        },
       ),
     ],
   );
