@@ -45,6 +45,10 @@ linux/flutter/generated_plugin_registrant.cc
 .codex
 *.iml
 
+# Firebase
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
 # System
 .DS_Store
 Thumbs.db

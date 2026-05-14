@@ -14,6 +14,8 @@ import '../../features/kost/presentation/screens/kost_map_screen.dart';
 import '../../features/booking/presentation/screens/booking_screen.dart';
 import '../../features/booking/presentation/screens/payment_screen.dart';
 
+import '../../features/profile/presentation/screens/profile_screen.dart';
+
 final authStateProvider = StateProvider<bool>((ref) => false);
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -70,7 +72,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/profile',
-        builder: (context, state) => const Scaffold(body: Center(child: Text('Profile Screen - Pending'))),
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: '/booking/:roomId',

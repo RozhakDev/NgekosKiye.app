@@ -68,7 +68,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               AspectRatio(
                                 aspectRatio: 16 / 9,
                                 child: kost.images.isNotEmpty
-                                    ? Image.network(kost.images.first, fit: BoxFit.cover, errorBuilder: (_,__,___) => const Icon(Icons.image_not_supported, size: 50, color: Colors.grey))
+                                    ? Image.network(kost.images.first, fit: BoxFit.cover, errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported, size: 50, color: Colors.grey))
                                     : Container(color: Colors.grey, child: const Icon(Icons.image, size: 50)),
                               ),
                               Padding(

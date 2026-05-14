@@ -1,4 +1,4 @@
-package com.ngekoskiye.ngekoskiye
+package com.ngekoskiye
 
 import io.flutter.embedding.android.FlutterActivity
 

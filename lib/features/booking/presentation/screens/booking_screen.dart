@@ -95,7 +95,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             const Text('DURASI SEWA (BULAN)', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
-              value: _duration,
+              initialValue: _duration,
               decoration: const InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.zero)),
               items: List.generate(12, (index) => DropdownMenuItem(value: index + 1, child: Text('${index + 1} Bulan'))),
               onChanged: (val) => setState(() => _duration = val!),
