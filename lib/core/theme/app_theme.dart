@@ -16,37 +16,37 @@ class AppTheme {
         surface: AppColors.surface,
         error: AppColors.error,
       ),
-      textTheme: GoogleFonts.latoTextTheme().copyWith(
-        displayLarge: GoogleFonts.lato(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-        titleLarge: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-        bodyLarge: GoogleFonts.lato(fontSize: 16, color: AppColors.textPrimary),
-        bodyMedium: GoogleFonts.lato(fontSize: 14, color: AppColors.textSecondary),
+      textTheme: GoogleFonts.interTextTheme().copyWith(
+        displayLarge: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+        titleLarge: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+        bodyLarge: GoogleFonts.inter(fontSize: 16, color: AppColors.textPrimary),
+        bodyMedium: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.primary,
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.primary),
+        iconTheme: IconThemeData(color: AppColors.textPrimary),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          elevation: 0,
+          elevation: 2,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          textStyle: GoogleFonts.lato(fontWeight: FontWeight.bold, fontSize: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
-        border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.border)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.primary, width: 2)),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary, width: 2)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }
