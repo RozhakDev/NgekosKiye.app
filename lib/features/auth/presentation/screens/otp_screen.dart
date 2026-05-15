@@ -106,8 +106,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final isLoading = ref.watch(authControllerProvider).isLoading;
 
     final defaultPinTheme = PinTheme(
-      width: 56,
-      height: 64,
+      width: 50,
+      height: 60,
       textStyle: const TextStyle(
         fontSize: 24,
         color: AppColors.textPrimary,
@@ -116,7 +116,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.zero,
+        borderRadius: BorderRadius.circular(8),
       ),
     );
 
@@ -127,95 +127,111 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Verifikasi\nKode OTP',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 16),
-              RichText(
-                text: TextSpan(
-                  text: 'Kami telah mengirimkan 6 digit kode ke email Anda ',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                    height: 1.5,
-                  ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextSpan(
-                      text: widget.email,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
+                    const SizedBox(height: 16),
+                    const Text(
+                      'VERIFIKASI',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2.0,
+                        color: AppColors.primary,
                       ),
                     ),
-                    const TextSpan(text: '.'),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Masukkan Kode OTP',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    RichText(
+                      text: TextSpan(
+                        text: 'Kami telah mengirimkan 6 digit kode ke email Anda ',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                          height: 1.5,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: widget.email,
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const TextSpan(text: '.'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                    
+                    Center(
+                      child: Pinput(
+                        length: 6,
+                        controller: _otpCtrl,
+                        focusNode: _focusNode,
+                        defaultPinTheme: defaultPinTheme,
+                        focusedPinTheme: focusedPinTheme,
+                        separatorBuilder: (index) => const SizedBox(width: 8),
+                        onCompleted: (pin) {
+                          if (!isLoading) _verify();
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                    
+                    Center(
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'Belum menerima kode? ',
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                          children: [
+                            TextSpan(
+                              text: _canResend ? 'Kirim ulang' : 'Kirim ulang ($timerText)',
+                              style: TextStyle(
+                                color: _canResend ? AppColors.primary : AppColors.error,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              recognizer: _canResend ? (TapGestureRecognizer()..onTap = _resend) : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 48),
-              Center(
-                child: Pinput(
-                  length: 6,
-                  controller: _otpCtrl,
-                  focusNode: _focusNode,
-                  defaultPinTheme: defaultPinTheme,
-                  focusedPinTheme: focusedPinTheme,
-                  separatorBuilder: (index) => const SizedBox(width: 0),
-                  onCompleted: (pin) {
-                    if (!isLoading) _verify();
-                  },
-                ),
-              ),
-              const SizedBox(height: 32),
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                    text: 'Belum menerima kode? ',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                    children: [
-                      TextSpan(
-                        text: _canResend ? 'Kirim ulang' : 'Kirim ulang ($timerText)',
-                        style: TextStyle(
-                          color: _canResend ? AppColors.primary : AppColors.textSecondary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        recognizer: _canResend ? (TapGestureRecognizer()..onTap = _resend) : null,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Spacer(),
-              ElevatedButton(
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: ElevatedButton(
                 onPressed: (isLoading || _otpCtrl.text.length < 6) ? null : _verify,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  elevation: 0,
                   disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
                 ),
                 child: isLoading 
@@ -226,16 +242,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     )
                   : const Text(
                       'VERIFIKASI',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                      ),
+                      style: TextStyle(letterSpacing: 1.2),
                     ),
               ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

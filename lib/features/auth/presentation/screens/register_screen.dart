@@ -17,26 +17,31 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailCtrl = TextEditingController();
   final _userCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
-  final _passConfirmCtrl = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  bool _agreedToTerms = false;
 
   @override
   void dispose() {
     _emailCtrl.dispose();
     _userCtrl.dispose();
     _passCtrl.dispose();
-    _passConfirmCtrl.dispose();
     super.dispose();
   }
 
   void _register() async {
+    if (!_agreedToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Anda harus menyetujui Syarat & Ketentuan.'), backgroundColor: AppColors.error),
+      );
+      return;
+    }
+
     final data = {
       "username": _userCtrl.text.trim(),
       "email": _emailCtrl.text.trim(),
       "password": _passCtrl.text,
-      "password_confirm": _passConfirmCtrl.text,
+      "password_confirm": _passCtrl.text, 
     };
 
     final notifier = ref.read(authControllerProvider.notifier);
@@ -46,22 +51,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registrasi sukses. Silakan cek email untuk OTP.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.black),
       );
-      context.push('/otp', extra: _emailCtrl.text.trim());
+      final email = Uri.encodeComponent(_emailCtrl.text.trim());
+      context.push('/otp?email=$email');
     }
-  }
-
-  InputDecoration _buildInputDecoration(String labelText, {Widget? suffixIcon}) {
-    return InputDecoration(
-      labelText: labelText,
-      labelStyle: const TextStyle(color: AppColors.textSecondary),
-      enabledBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: AppColors.border),
-      ),
-      focusedBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: AppColors.primary, width: 2.0),
-      ),
-      suffixIcon: suffixIcon,
-    );
   }
 
   @override
@@ -77,14 +69,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final isLoading = ref.watch(authControllerProvider).isLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.primary),
+          icon: const Icon(Icons.close, color: AppColors.textPrimary),
           onPressed: () => context.go('/'),
-          tooltip: 'Kembali ke Beranda',
         ),
       ),
       body: SafeArea(
@@ -95,21 +86,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             children: [
               const SizedBox(height: 16),
               const Text(
-                'NGEKOSKIYE',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2.0,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Buat Akun',
+                'Buat Akun Baru',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -122,94 +103,93 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 48),
+              
+              const Text('Nama Pengguna', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
               TextField(
                 controller: _userCtrl,
-                decoration: _buildInputDecoration('Username'),
-                style: const TextStyle(color: AppColors.textPrimary),
+                decoration: const InputDecoration(
+                  hintText: 'ngekoskiye.official',
+                  prefixIcon: Icon(Icons.person_outline, color: AppColors.textSecondary),
+                ),
               ),
               const SizedBox(height: 24),
+              
+              const Text('Alamat Email', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
               TextField(
                 controller: _emailCtrl,
-                decoration: _buildInputDecoration('Email'),
+                decoration: const InputDecoration(
+                  hintText: 'ngekoskiye@email.com',
+                  prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                ),
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(color: AppColors.textPrimary),
               ),
               const SizedBox(height: 24),
+              
+              const Text('Kata Sandi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _passCtrl,
+                decoration: InputDecoration(
+                  hintText: 'Minimal 8 karakter',
+                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      color: AppColors.textSecondary,
+                    ),
+                    onPressed: () {
+                      setState(() => _obscurePassword = !_obscurePassword);
+                    },
+                  ),
+                ),
+                obscureText: _obscurePassword,
+              ),
+              const SizedBox(height: 32),
+              
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _passCtrl,
-                      decoration: _buildInputDecoration(
-                        'Password',
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                            color: AppColors.textSecondary,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
-                      ),
-                      obscureText: _obscurePassword,
-                      style: const TextStyle(color: AppColors.textPrimary),
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: Checkbox(
+                      value: _agreedToTerms,
+                      activeColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      onChanged: (val) {
+                        setState(() => _agreedToTerms = val ?? false);
+                      },
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: TextField(
-                      controller: _passConfirmCtrl,
-                      decoration: _buildInputDecoration(
-                        'Konfirmasi Password',
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                            color: AppColors.textSecondary,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
-                            });
-                          },
-                        ),
+                    child: RichText(
+                      text: const TextSpan(
+                        text: 'Saya menyetujui ',
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+                        children: [
+                          TextSpan(text: 'Syarat & Ketentuan', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                          TextSpan(text: ' dan '),
+                          TextSpan(text: 'Kebijakan Privasi', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                          TextSpan(text: ' yang berlaku.'),
+                        ],
                       ),
-                      obscureText: _obscureConfirmPassword,
-                      style: const TextStyle(color: AppColors.textPrimary),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
+              
               ElevatedButton(
                 onPressed: isLoading ? null : _register,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  elevation: 0,
-                ),
                 child: isLoading 
-                  ? const SizedBox(
-                      height: 20, 
-                      width: 20, 
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                    )
-                  : const Text(
-                      'DAFTAR',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  : const Text('DAFTAR SEKARANG', style: TextStyle(letterSpacing: 1.2)),
               ),
               const SizedBox(height: 32),
+              
               Center(
                 child: RichText(
                   text: TextSpan(
@@ -217,7 +197,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
                     children: [
                       TextSpan(
-                        text: 'Masuk sekarang',
+                        text: 'Masuk di sini',
                         style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                         recognizer: TapGestureRecognizer()..onTap = () => context.push('/login'),
                       ),
@@ -225,7 +205,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
             ],
           ),
         ),

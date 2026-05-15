@@ -48,7 +48,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/otp',
         builder: (context, state) {
-          final email = state.extra as String? ?? '';
+          final email = state.uri.queryParameters['email'] ?? state.extra as String? ?? '';
           return OtpScreen(email: email);
         },
       ),

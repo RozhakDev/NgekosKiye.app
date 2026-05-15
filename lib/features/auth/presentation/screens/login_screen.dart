@@ -47,8 +47,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               label: 'Verifikasi',
               textColor: Colors.white,
               onPressed: () {
-                final email = _emailController.text.trim();
-                context.push('/otp', extra: email);
+                final input = _emailController.text.trim();
+                if (input.contains('@')) {
+                  context.push('/otp?email=${Uri.encodeComponent(input)}');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Silakan login menggunakan email untuk melanjutkan verifikasi.', style: TextStyle(color: Colors.white)), backgroundColor: AppColors.error),
+                  );
+                }
               },
             ) : null,
           ),
@@ -59,14 +65,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.primary),
+          icon: const Icon(Icons.close, color: AppColors.textPrimary),
           onPressed: () => context.go('/'),
-          tooltip: 'Kembali ke Beranda',
         ),
       ),
       body: SafeArea(
@@ -77,26 +82,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             children: [
               const SizedBox(height: 16),
               const Text(
-                'NGEKOSKIYE',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2.0,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
                 'Masuk ke Akun',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Temukan kembali hunian premium yang telah Anda simpan.',
+                'Selamat datang kembali, silakan masuk untuk melanjutkan pencarian kost Anda.',
                 style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
@@ -104,33 +99,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 48),
+              
+              const Text('Alamat Email', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(
-                  labelText: 'Email atau Username',
-                  labelStyle: TextStyle(color: AppColors.textSecondary),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.border),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.primary, width: 2.0),
-                  ),
+                  hintText: 'ngekoskiye@email.com',
+                  prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
                 ),
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(color: AppColors.textPrimary),
               ),
               const SizedBox(height: 24),
+              
+              const Text('Kata Sandi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: const TextStyle(color: AppColors.textSecondary),
-                  enabledBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.border),
-                  ),
-                  focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.primary, width: 2.0),
-                  ),
+                  hintText: 'Masukkan kata sandi',
+                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -144,60 +132,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 obscureText: _obscurePassword,
-                style: const TextStyle(color: AppColors.textPrimary),
               ),
               const SizedBox(height: 16),
+              
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Fitur Lupa Password akan segera hadir.'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
+                      const SnackBar(content: Text('Fitur Lupa Kata Sandi segera hadir.')),
                     );
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.textSecondary,
+                    foregroundColor: AppColors.primary,
                     padding: EdgeInsets.zero,
-                    minimumSize: const Size(50, 30),
+                    minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text(
-                    'Lupa Password?',
-                    style: TextStyle(fontSize: 14),
-                  ),
+                  child: const Text('Lupa Kata Sandi?', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 48),
+              
               ElevatedButton(
                 onPressed: authState.isLoading ? null : _login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  elevation: 0,
-                ),
                 child: authState.isLoading 
-                  ? const SizedBox(
-                      height: 20, 
-                      width: 20, 
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                    )
-                  : const Text(
-                      'MASUK',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  : const Text('MASUK SEKARANG', style: TextStyle(letterSpacing: 1.2)),
               ),
               const SizedBox(height: 32),
+              
               Center(
                 child: RichText(
                   text: TextSpan(
@@ -205,7 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
                     children: [
                       TextSpan(
-                        text: 'Daftar sekarang',
+                        text: 'Daftar di sini',
                         style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                         recognizer: TapGestureRecognizer()..onTap = () => context.push('/register'),
                       ),
@@ -213,7 +177,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
             ],
           ),
         ),
