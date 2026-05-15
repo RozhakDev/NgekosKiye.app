@@ -1,8 +1,11 @@
+import 'dart:async';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ngekoskiye/core/theme/app_colors.dart';
+import 'package:pinput/pinput.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../controllers/auth_controller.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
@@ -15,9 +18,56 @@ class OtpScreen extends ConsumerStatefulWidget {
 
 class _OtpScreenState extends ConsumerState<OtpScreen> {
   final _otpCtrl = TextEditingController();
+  final _focusNode = FocusNode();
+  
+  Timer? _timer;
+  int _start = 45;
+  bool _canResend = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    setState(() {
+      _start = 45;
+      _canResend = false;
+    });
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            timer.cancel();
+            _canResend = true;
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _otpCtrl.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  String get timerText {
+    final minutes = (_start ~/ 60).toString().padLeft(2, '0');
+    final seconds = (_start % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
 
   void _verify() async {
-    if (_otpCtrl.text.isEmpty) return;
+    if (_otpCtrl.text.length < 6) return;
     final notifier = ref.read(authControllerProvider.notifier);
     await notifier.verifyOtp(widget.email, _otpCtrl.text.trim());
 
@@ -30,10 +80,13 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   }
 
   void _resend() async {
+    if (!_canResend) return;
+    
     final notifier = ref.read(authControllerProvider.notifier);
     await notifier.resendOtp(widget.email);
 
     if (mounted && !ref.read(authControllerProvider).hasError) {
+      _startTimer();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('OTP telah dikirim ulang.'), backgroundColor: Colors.black),
       );
@@ -52,36 +105,137 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
     final isLoading = ref.watch(authControllerProvider).isLoading;
 
+    final defaultPinTheme = PinTheme(
+      width: 56,
+      height: 64,
+      textStyle: const TextStyle(
+        fontSize: 24,
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.bold,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.zero,
+      ),
+    );
+
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration!.copyWith(
+        border: Border.all(color: AppColors.primary, width: 2),
+      ),
+    );
+
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: AppBar(title: const Text('VERIFIKASI OTP')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Kami telah mengirimkan 6 digit kode OTP ke:\n${widget.email}', style: const TextStyle(height: 1.5)),
-            const SizedBox(height: 32),
-            TextField(
-              controller: _otpCtrl,
-              decoration: const InputDecoration(labelText: 'Kode OTP', hintText: '123456'),
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 24, letterSpacing: 8, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: isLoading ? null : _verify,
-              child: isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('VERIFIKASI'),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: isLoading ? null : _resend,
-              style: TextButton.styleFrom(foregroundColor: AppColors.textPrimary),
-              child: const Text('KIRIM ULANG OTP'),
-            ),
-          ],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Verifikasi\nKode OTP',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 16),
+              RichText(
+                text: TextSpan(
+                  text: 'Kami telah mengirimkan 6 digit kode ke email Anda ',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                    height: 1.5,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: widget.email,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const TextSpan(text: '.'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 48),
+              Center(
+                child: Pinput(
+                  length: 6,
+                  controller: _otpCtrl,
+                  focusNode: _focusNode,
+                  defaultPinTheme: defaultPinTheme,
+                  focusedPinTheme: focusedPinTheme,
+                  separatorBuilder: (index) => const SizedBox(width: 0),
+                  onCompleted: (pin) {
+                    if (!isLoading) _verify();
+                  },
+                ),
+              ),
+              const SizedBox(height: 32),
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    text: 'Belum menerima kode? ',
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                    children: [
+                      TextSpan(
+                        text: _canResend ? 'Kirim ulang' : 'Kirim ulang ($timerText)',
+                        style: TextStyle(
+                          color: _canResend ? AppColors.primary : AppColors.textSecondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        recognizer: _canResend ? (TapGestureRecognizer()..onTap = _resend) : null,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Spacer(),
+              ElevatedButton(
+                onPressed: (isLoading || _otpCtrl.text.length < 6) ? null : _verify,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  elevation: 0,
+                  disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+                ),
+                child: isLoading 
+                  ? const SizedBox(
+                      height: 20, 
+                      width: 20, 
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                    )
+                  : const Text(
+                      'VERIFIKASI',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
