@@ -29,4 +29,10 @@ class AuthRepository {
       'otp': otp,
     });
   }
+
+  Future<Response> resendOtp(String email) async {
+    return await _dio.post('/users/auth/resend-otp/', data: {
+      'email': email,
+    });
+  }
 }

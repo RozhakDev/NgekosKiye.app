@@ -67,4 +67,17 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
       state = AsyncValue.error(errorMsg, e.stackTrace);
     }
   }
+
+  Future<void> resendOtp(String email) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.resendOtp(email);
+      state = const AsyncValue.data(null);
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data['pesan'] ?? 'Gagal mengirim ulang OTP.';
+      state = AsyncValue.error(errorMsg, e.stackTrace);
+    } catch (e, st) {
+      state = AsyncValue.error('Terjadi kesalahan jaringan', st);
+    }
+  }
 }

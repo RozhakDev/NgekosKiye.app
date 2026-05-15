@@ -28,11 +28,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {
       if (!state.isLoading && state.hasError) {
+        final errorMsg = state.error.toString();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(state.error.toString(), style: const TextStyle(color: Colors.white)),
+            content: Text(errorMsg, style: const TextStyle(color: Colors.white)),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
+            action: errorMsg.toLowerCase().contains('belum diverifikasi') ? SnackBarAction(
+              label: 'Verifikasi',
+              textColor: Colors.white,
+              onPressed: () {
+                final email = _emailController.text.trim();
+                context.push('/otp', extra: email);
+              },
+            ) : null,
           ),
         );
       }

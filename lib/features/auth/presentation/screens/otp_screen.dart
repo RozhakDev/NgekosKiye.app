@@ -29,6 +29,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
   }
 
+  void _resend() async {
+    final notifier = ref.read(authControllerProvider.notifier);
+    await notifier.resendOtp(widget.email);
+
+    if (mounted && !ref.read(authControllerProvider).hasError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP telah dikirim ulang.'), backgroundColor: Colors.black),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {
@@ -63,6 +74,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             ElevatedButton(
               onPressed: isLoading ? null : _verify,
               child: isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('VERIFIKASI'),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: isLoading ? null : _resend,
+              style: TextButton.styleFrom(foregroundColor: AppColors.textPrimary),
+              child: const Text('KIRIM ULANG OTP'),
             ),
           ],
         ),

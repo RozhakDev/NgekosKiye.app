@@ -21,7 +21,17 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.response?.statusCode == 401) {
+    final isAuthPath = err.requestOptions.path.contains('/auth/login') || 
+                       err.requestOptions.path.contains('/auth/refresh') || 
+                       err.requestOptions.path.contains('/auth/register') ||
+                       err.requestOptions.path.contains('/auth/verify-otp') ||
+                       err.requestOptions.path.contains('/auth/resend-otp');
+
+    if (err.response?.statusCode == 401 && !isAuthPath) {
+      if (err.requestOptions.extra['isRetry'] == true) {
+        return super.onError(err, handler);
+      }
+
       final refreshToken = await secureStorage.getRefreshToken();
       if (refreshToken != null) {
         try {
@@ -32,6 +42,7 @@ class AuthInterceptor extends Interceptor {
           await secureStorage.saveTokens(access: newAccessToken, refresh: refreshToken);
           
           final options = err.requestOptions;
+          options.extra['isRetry'] = true;
           options.headers['Authorization'] = 'Bearer $newAccessToken';
           final cloneReq = await dio.fetch(options);
           return handler.resolve(cloneReq);
