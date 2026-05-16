@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 
 import '../controllers/kost_list_controller.dart';
 import '../../domain/kost_model.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
+
+final selectedRoomIdProvider = StateProvider.autoDispose<int?>((ref) => null);
 
 class KostDetailScreen extends ConsumerStatefulWidget {
   final int id;
@@ -16,25 +19,41 @@ class KostDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _KostDetailScreenState extends ConsumerState<KostDetailScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _roomsSectionKey = GlobalKey();
+
+  void _scrollToRooms() {
+    final context = _roomsSectionKey.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final detailAsyncValue = ref.watch(kostDetailProvider(widget.id));
 
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: const _DetailAppBar(),
       body: detailAsyncValue.when(
         data: (kost) => CustomScrollView(
+          controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            _ImageSliderSliver(images: kost.images),
-            _TitleSectionSliver(kost: kost),
-            const _DividerSliver(),
-            _FacilitiesSectionSliver(facilitiesStr: kost.facilities),
-            const _DividerSliver(),
-            _DescriptionSectionSliver(description: kost.description),
-            const _DividerSliver(),
-            _LocationSectionSliver(kost: kost),
+            _ImageGallerySliver(images: kost.images),
+            _TitleLocationSliver(kost: kost),
+            const _ThickDividerSliver(),
+            _FacilitiesSliver(facilitiesStr: kost.facilities),
+            const _ThickDividerSliver(),
+            _RoomsSelectionSliver(kost: kost, sectionKey: _roomsSectionKey),
+            const _ThickDividerSliver(),
+            _DescriptionSliver(description: kost.description),
+            const _ThickDividerSliver(),
+            _LocationMapSliver(kost: kost),
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
         ),
@@ -42,60 +61,22 @@ class _KostDetailScreenState extends ConsumerState<KostDetailScreen> {
         error: (err, stack) => Center(child: Text('Gagal memuat detail: $err')),
       ),
       bottomNavigationBar: detailAsyncValue.maybeWhen(
-        data: (kost) => _BottomActionBar(kost: kost),
-        orElse: () => null,
+        data: (kost) => _StickyBottomBar(kost: kost, onScrollToRooms: _scrollToRooms),
+        orElse: () => const SizedBox.shrink(),
       ),
     );
   }
 }
 
-class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _DetailAppBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.surface,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-        onPressed: () => context.pop(),
-      ),
-      title: const Text(
-        'NGEKOSKIYE',
-        style: TextStyle(
-          fontWeight: FontWeight.w900,
-          fontSize: 18,
-          letterSpacing: 1.5,
-          color: AppColors.primary,
-        ),
-      ),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.favorite_border, color: AppColors.primary),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Disimpan ke favorit')));
-          },
-        ),
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
-class _ImageSliderSliver extends StatefulWidget {
+class _ImageGallerySliver extends StatefulWidget {
   final List<String> images;
-
-  const _ImageSliderSliver({required this.images});
+  const _ImageGallerySliver({required this.images});
 
   @override
-  State<_ImageSliderSliver> createState() => _ImageSliderSliverState();
+  State<_ImageGallerySliver> createState() => _ImageGallerySliverState();
 }
 
-class _ImageSliderSliverState extends State<_ImageSliderSliver> {
+class _ImageGallerySliverState extends State<_ImageGallerySliver> {
   int _currentIndex = 0;
 
   @override
@@ -104,7 +85,7 @@ class _ImageSliderSliverState extends State<_ImageSliderSliver> {
       child: Stack(
         children: [
           AspectRatio(
-            aspectRatio: 1,
+            aspectRatio: 4 / 3,
             child: widget.images.isEmpty
                 ? Container(color: Colors.grey[300])
                 : PageView.builder(
@@ -123,88 +104,142 @@ class _ImageSliderSliverState extends State<_ImageSliderSliver> {
                     },
                   ),
           ),
+          
           Positioned(
-            top: 24,
-            left: 24,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              color: AppColors.primary,
-              child: const Text(
-                'TERSEDIA',
-                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-              ),
+            top: MediaQuery.of(context).padding.top + 16,
+            left: 16,
+            right: 16,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildCircularBtn(
+                  icon: Icons.arrow_back,
+                  onTap: () => context.pop(),
+                ),
+                Row(
+                  children: [
+                    _buildCircularBtn(
+                      icon: Icons.favorite_border,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Disimpan ke favorit')));
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildCircularBtn(
+                      icon: Icons.share_outlined,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Membagikan...')));
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          Positioned(
-            bottom: 16,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                widget.images.isEmpty ? 1 : widget.images.length,
-                (index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentIndex == index ? 8 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _currentIndex == index ? Colors.white : Colors.white.withOpacity(0.5),
+
+          if (widget.images.length > 1)
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${_currentIndex + 1}/${widget.images.length}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
   }
+
+  Widget _buildCircularBtn({required IconData icon, required VoidCallback onTap}) {
+    return Material(
+      color: Colors.white,
+      shape: const CircleBorder(),
+      elevation: 2,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(icon, color: AppColors.textPrimary, size: 20),
+        ),
+      ),
+    );
+  }
 }
 
-class _TitleSectionSliver extends StatelessWidget {
+class _TitleLocationSliver extends StatelessWidget {
   final KostModel kost;
 
-  const _TitleSectionSliver({required this.kost});
+  const _TitleLocationSliver({required this.kost});
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                'Campur',
+                style: TextStyle(color: Colors.blue, fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 12),
             Text(
               kost.name,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.primary, height: 1.2),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.textPrimary, height: 1.2),
             ),
             const SizedBox(height: 12),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Icon(Icons.location_on_outlined, size: 18, color: AppColors.textSecondary),
                 const SizedBox(width: 4),
                 Expanded(
-                  child: Text(
-                    kost.address,
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        kost.address,
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                      ),
+                      const SizedBox(height: 4),
+                      GestureDetector(
+                        onTap: () => context.push('/map', extra: {'lat': kost.latitude, 'lng': kost.longitude, 'name': kost.name}),
+                        child: const Text(
+                          'Lihat Peta',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  CurrencyFormatter.toIDR(kost.minPrice),
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary),
-                ),
-                const Text(
-                  ' / bulan',
-                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -212,68 +247,87 @@ class _TitleSectionSliver extends StatelessWidget {
   }
 }
 
-class _FacilitiesSectionSliver extends StatelessWidget {
+class _FacilitiesSliver extends StatelessWidget {
   final String facilitiesStr;
 
-  const _FacilitiesSectionSliver({required this.facilitiesStr});
-
-  IconData _getIconForFacility(String facility) {
-    final lower = facility.toLowerCase();
-    if (lower.contains('wifi') || lower.contains('internet')) return Icons.wifi;
-    if (lower.contains('ac')) return Icons.ac_unit;
-    if (lower.contains('kamar mandi dalam') || lower.contains('km dalam')) return Icons.shower_outlined;
-    if (lower.contains('laundry')) return Icons.local_laundry_service_outlined;
-    if (lower.contains('dapur')) return Icons.kitchen_outlined;
-    if (lower.contains('parkir')) return Icons.local_parking_outlined;
-    if (lower.contains('gym') || lower.contains('fitness')) return Icons.fitness_center_outlined;
-    if (lower.contains('keamanan') || lower.contains('cctv')) return Icons.security_outlined;
-    if (lower.contains('kasur')) return Icons.bed_outlined;
-    if (lower.contains('lemari')) return Icons.door_sliding_outlined;
-    return Icons.check_circle_outline;
-  }
+  const _FacilitiesSliver({required this.facilitiesStr});
 
   @override
   Widget build(BuildContext context) {
-    final facilities = facilitiesStr.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final allFacilities = facilitiesStr.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final previewFacilities = allFacilities.take(4).toList();
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Fasilitas Utama',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
+              'Fasilitas Populer',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
-            const SizedBox(height: 24),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 3,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: facilities.length,
-              itemBuilder: (context, index) {
-                final facility = facilities[index];
-                return Row(
-                  children: [
-                    Icon(_getIconForFacility(facility), size: 24, color: AppColors.primary),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        facility,
-                        style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: previewFacilities.map((facility) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: AppColors.border),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    facility,
+                    style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                  ),
                 );
-              },
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                    builder: (context) {
+                      return Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Semua Fasilitas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 16),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: allFacilities.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: const Icon(Icons.check_circle, color: AppColors.primary),
+                                    title: Text(allFacilities[index]),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text('Lihat Semua Fasilitas'),
+              ),
             ),
           ],
         ),
@@ -282,24 +336,214 @@ class _FacilitiesSectionSliver extends StatelessWidget {
   }
 }
 
-class _DescriptionSectionSliver extends StatelessWidget {
+class _RoomsSelectionSliver extends ConsumerWidget {
+  final KostModel kost;
+  final GlobalKey sectionKey;
+
+  const _RoomsSelectionSliver({required this.kost, required this.sectionKey});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rooms = kost.rooms ?? [];
+    final selectedId = ref.watch(selectedRoomIdProvider);
+
+    return SliverToBoxAdapter(
+      key: sectionKey,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Pilih Tipe Kamar',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+            ),
+            const SizedBox(height: 16),
+            if (rooms.isEmpty)
+              const Text('Belum ada kamar tersedia.', style: TextStyle(color: AppColors.textSecondary))
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: rooms.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 16),
+                itemBuilder: (context, index) {
+                  final room = rooms[index];
+                  final isAvailable = room.status == 'available';
+                  final isSelected = selectedId == room.id;
+
+                  return GestureDetector(
+                    onTap: isAvailable ? () {
+                      if (isSelected) {
+                        ref.read(selectedRoomIdProvider.notifier).state = null;
+                      } else {
+                        ref.read(selectedRoomIdProvider.notifier).state = room.id;
+                      }
+                    } : null,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: isSelected ? AppColors.primary : AppColors.border,
+                          width: isSelected ? 2 : 1,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _RoomImageCarousel(images: room.images),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          'Kamar ${room.roomNumber}',
+                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                                        ),
+                                      ),
+                                      if (!isAvailable)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.error,
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: const Text('Penuh', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      RichText(
+                                        text: TextSpan(
+                                          text: CurrencyFormatter.toIDR(room.price),
+                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                          children: const [
+                                            TextSpan(
+                                              text: '/bln',
+                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: AppColors.textSecondary),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      if (isAvailable)
+                                        Icon(
+                                          isSelected ? Icons.check_circle : Icons.add_circle_outline,
+                                          color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                                          size: 24,
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoomImageCarousel extends StatefulWidget {
+  final List<String> images;
+
+  const _RoomImageCarousel({required this.images});
+
+  @override
+  State<_RoomImageCarousel> createState() => _RoomImageCarouselState();
+}
+
+class _RoomImageCarouselState extends State<_RoomImageCarousel> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: const BoxDecoration(
+        color: Color(0xFFEEEEEE),
+        borderRadius: BorderRadius.horizontal(left: Radius.circular(10)),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.horizontal(left: Radius.circular(10)),
+        child: widget.images.isEmpty
+            ? const Icon(Icons.bed, color: Colors.grey, size: 40)
+            : Stack(
+                children: [
+                  PageView.builder(
+                    itemCount: widget.images.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return Image.network(
+                        widget.images[index],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.grey),
+                      );
+                    },
+                  ),
+                  if (widget.images.length > 1)
+                    Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${_currentIndex + 1}/${widget.images.length}',
+                          style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+class _DescriptionSliver extends StatelessWidget {
   final String description;
 
-  const _DescriptionSectionSliver({required this.description});
+  const _DescriptionSliver({required this.description});
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Deskripsi',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               description,
               style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.6),
@@ -311,45 +555,43 @@ class _DescriptionSectionSliver extends StatelessWidget {
   }
 }
 
-class _LocationSectionSliver extends StatelessWidget {
+class _LocationMapSliver extends StatelessWidget {
   final KostModel kost;
 
-  const _LocationSectionSliver({required this.kost});
+  const _LocationMapSliver({required this.kost});
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Lokasi',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             GestureDetector(
               onTap: () => context.push('/map', extra: {'lat': kost.latitude, 'lng': kost.longitude, 'name': kost.name}),
               child: Container(
-                height: 200,
+                height: 180,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.border),
                 ),
-                child: const Center(
-                  child: Text(
-                    'PETA LOKASI',
-                    style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-                  ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.location_on, color: AppColors.error, size: 40),
+                    SizedBox(height: 8),
+                    Text('Lihat Peta Lokasi', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              kost.address,
-              style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.5),
             ),
           ],
         ),
@@ -358,55 +600,97 @@ class _LocationSectionSliver extends StatelessWidget {
   }
 }
 
-class _BottomActionBar extends StatelessWidget {
+class _StickyBottomBar extends ConsumerWidget {
   final KostModel kost;
+  final VoidCallback onScrollToRooms;
 
-  const _BottomActionBar({required this.kost});
+  const _StickyBottomBar({required this.kost, required this.onScrollToRooms});
 
   @override
-  Widget build(BuildContext context) {
-    bool hasAvailableRoom = kost.rooms != null && kost.rooms!.any((r) => r.status == 'available');
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedId = ref.watch(selectedRoomIdProvider);
+    final rooms = kost.rooms ?? [];
     
+    RoomModel? selectedRoom;
+    if (selectedId != null) {
+      try {
+        selectedRoom = rooms.firstWhere((r) => r.id == selectedId);
+      } catch (_) {}
+    }
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: const BoxDecoration(
-        color: AppColors.surface,
+        color: Colors.white,
         border: Border(top: BorderSide(color: AppColors.border)),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2)),
+        ],
       ),
       child: SafeArea(
-        child: ElevatedButton(
-          onPressed: hasAvailableRoom ? () {
-            final room = kost.rooms!.firstWhere((r) => r.status == 'available');
-            context.push('/booking/${room.id}', extra: {
-              'kostId': kost.id,
-              'roomPrice': double.parse(room.price)
-            });
-          } : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            elevation: 0,
-            disabledBackgroundColor: AppColors.textSecondary,
-          ),
-          child: Text(
-            hasAvailableRoom ? 'PESAN SEKARANG' : 'KAMAR PENUH',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-          ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    selectedRoom != null ? 'Total' : 'Mulai dari',
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  ),
+                  RichText(
+                    text: TextSpan(
+                      text: CurrencyFormatter.toIDR(selectedRoom != null ? selectedRoom.price : kost.minPrice),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
+                      children: const [
+                        TextSpan(
+                          text: '/bln',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: AppColors.textPrimary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton(
+              onPressed: () {
+                if (selectedRoom != null) {
+                  context.push('/booking/${selectedRoom.id}', extra: {
+                    'kostId': kost.id,
+                    'roomPrice': double.parse(selectedRoom.price)
+                  });
+                } else {
+                  onScrollToRooms();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              ),
+              child: Text(
+                selectedRoom != null ? 'Pesan Sekarang' : 'Pilih Kamar',
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _DividerSliver extends StatelessWidget {
-  const _DividerSliver();
+class _ThickDividerSliver extends StatelessWidget {
+  const _ThickDividerSliver();
 
   @override
   Widget build(BuildContext context) {
-    return const SliverToBoxAdapter(
-      child: Divider(height: 1, thickness: 1, color: AppColors.border),
+    return SliverToBoxAdapter(
+      child: Container(
+        height: 8,
+        color: AppColors.background,
+      ),
     );
   }
 }

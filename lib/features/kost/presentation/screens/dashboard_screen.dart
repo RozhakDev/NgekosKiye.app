@@ -84,13 +84,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         const _SearchBarSliver(),
-        if (state.kosts.isNotEmpty) _FeaturedKostSliver(kost: state.kosts.first),
-        const SliverToBoxAdapter(child: SizedBox(height: 24)),
-        const _SectionTitleSliver(title: 'Rekomendasi Kami', actionText: 'LIHAT SEMUA'),
+        const _PromoSliderSliver(),
+        const _PopularLocationsSliver(),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+        const _SectionTitleSliver(title: 'Rekomendasi Kost', actionText: 'LIHAT SEMUA'),
         const _SeparatorLineSliver(),
-        const SliverToBoxAdapter(child: SizedBox(height: 24)),
-        if (state.kosts.length > 1) _KostListSliver(kosts: state.kosts.skip(1).toList()),
-        _LoadMoreSliver(isLoading: state.isLoading, hasMore: state.hasMore, onTapped: () => ref.read(kostListControllerProvider.notifier).fetchKosts()),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+        if (state.kosts.isNotEmpty) _KostListSliver(kosts: state.kosts),
+        _LoadMoreSliver(
+          isLoading: state.isLoading,
+          hasMore: state.hasMore,
+          onTapped: () => ref.read(kostListControllerProvider.notifier).fetchKosts(),
+        ),
       ],
     );
   }
@@ -102,27 +107,26 @@ class _DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.primary,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.menu, color: AppColors.primary),
+        icon: const Icon(Icons.menu, color: Colors.white),
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Menu ditekan')));
         },
       ),
       title: const Text(
-        'NGEKOSKIYE',
+        'NgekosKiye',
         style: TextStyle(
-          fontWeight: FontWeight.w900,
-          fontSize: 18,
-          letterSpacing: 1.5,
-          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+          color: Colors.white,
         ),
       ),
       centerTitle: true,
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_none, color: AppColors.primary),
+          icon: const Icon(Icons.notifications_none, color: Colors.white),
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notifikasi ditekan')));
           },
@@ -171,14 +175,28 @@ class _SearchBarSliver extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Container(
-        color: AppColors.surface,
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        child: TextField(
-          decoration: const InputDecoration(
-            hintText: 'Cari kost, lokasi, atau fasilitas...',
+        color: AppColors.primary,
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: const TextField(
+          decoration: InputDecoration(
+            hintText: 'Cari kos di kota mana?',
             hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
             prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+            contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
       ),
@@ -186,85 +204,129 @@ class _SearchBarSliver extends StatelessWidget {
   }
 }
 
-class _FeaturedKostSliver extends StatelessWidget {
-  final KostModel kost;
-
-  const _FeaturedKostSliver({required this.kost});
+class _PromoSliderSliver extends StatelessWidget {
+  const _PromoSliderSliver();
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
-      child: GestureDetector(
-        onTap: () => context.push('/kost/${kost.id}'),
-        child: Stack(
-          children: [
-            AspectRatio(
-              aspectRatio: 4 / 5,
-              child: kost.images.isNotEmpty
-                  ? Image.network(
-                      kost.images.first,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(color: Colors.grey[300]),
-                    )
-                  : Container(color: Colors.grey[300]),
-            ),
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-                    stops: const [0.5, 1.0],
-                  ),
-                ),
+      child: Container(
+        height: 140,
+        margin: const EdgeInsets.only(top: 8, bottom: 8),
+        child: ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          scrollDirection: Axis.horizontal,
+          itemCount: 3,
+          separatorBuilder: (_, __) => const SizedBox(width: 12),
+          itemBuilder: (context, index) {
+            final colors = [AppColors.primary, AppColors.secondary, Colors.teal];
+            final titles = ['Diskon 25%', 'Cashback 15%', 'Hemat 20%'];
+            final badges = ['Pengguna Baru', 'Promo Spesial', 'Terbatas'];
+            final subtitles = [
+              'Untuk pemesanan bulan pertama',
+              'Minimal transaksi Rp 500rb',
+              'Khusus kost area Banyumas'
+            ];
+
+            return Container(
+              width: MediaQuery.of(context).size.width - 34,
+              decoration: BoxDecoration(
+                color: colors[index],
+                borderRadius: BorderRadius.circular(12),
               ),
-            ),
-            Positioned(
-              bottom: 24,
-              left: 24,
-              right: 24,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    color: AppColors.primary,
-                    child: const Text(
-                      'KOST TERPOPULER',
-                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                  Positioned(
+                    right: -20,
+                    bottom: -20,
+                    child: Icon(
+                      Icons.local_offer,
+                      size: 100,
+                      color: Colors.white.withOpacity(0.15),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    kost.name,
-                    style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    kost.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => context.push('/kost/${kost.id}'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.primary,
-                        elevation: 0,
-                      ),
-                      child: const Text('LIHAT DETAIL'),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            badges[index],
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          titles[index],
+                          style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.1),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitles[index],
+                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w400),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+            );
+          },
         ),
+      ),
+    );
+  }
+}
+
+class _PopularLocationsSliver extends StatelessWidget {
+  const _PopularLocationsSliver();
+
+  @override
+  Widget build(BuildContext context) {
+    final locations = ['Banyumas', 'Cilacap', 'Purbalingga', 'Kebumen', 'Brebes', 'Tegal', 'Banjarnegara', 'Wonosobo'];
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: Text(
+              'Lokasi Populer',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+            ),
+          ),
+          SizedBox(
+            height: 36,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              scrollDirection: Axis.horizontal,
+              itemCount: locations.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: AppColors.border),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Text(
+                    locations[index],
+                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -280,24 +342,26 @@ class _SectionTitleSliver extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
             GestureDetector(
               onTap: () {},
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     actionText,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
                   ),
-                  const Icon(Icons.arrow_forward, size: 14, color: AppColors.textSecondary),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.primary),
                 ],
               ),
             ),
@@ -314,10 +378,7 @@ class _SeparatorLineSliver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SliverToBoxAdapter(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
-        child: Divider(color: AppColors.border, thickness: 1, height: 1),
-      ),
+      child: SizedBox.shrink(),
     );
   }
 }
@@ -333,8 +394,8 @@ class _KostListSliver extends StatelessWidget {
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           final kost = kosts[index];
-          final isNew = index % 2 == 0;
-          final badgeText = isNew ? 'BARU' : 'TERLARIS';
+          final isPromo = index % 2 == 0;
+          final badgeText = isPromo ? 'PROMO' : 'TERLARIS';
 
           return _KostListItemCard(kost: kost, badgeText: badgeText);
         },
@@ -355,67 +416,60 @@ class _KostListItemCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.push('/kost/${kost.id}'),
       child: Container(
-        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
+        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
-                AspectRatio(
-                  aspectRatio: 3 / 4,
-                  child: kost.images.isNotEmpty
-                      ? Image.network(
-                          kost.images.first,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(color: Colors.grey[300]),
-                        )
-                      : Container(color: Colors.grey[300]),
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: kost.images.isNotEmpty
+                        ? Image.network(
+                            kost.images.first,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(color: Colors.grey[300]),
+                          )
+                        : Container(color: Colors.grey[300]),
+                  ),
                 ),
                 Positioned(
-                  top: 16,
-                  left: 16,
+                  top: 12,
+                  left: 12,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    color: AppColors.surface,
+                    decoration: BoxDecoration(
+                      color: AppColors.error,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                     child: Text(
                       badgeText,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                     ),
                   ),
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          kost.name,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: 1.2),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        CurrencyFormatter.toShortIDR(kost.minPrice),
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined, size: 16, color: AppColors.textSecondary),
+                      const Icon(Icons.location_on, size: 14, color: AppColors.textSecondary),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           kost.address,
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -424,10 +478,29 @@ class _KostListItemCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    kost.facilities.replaceAll(',', ' •'),
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                    maxLines: 1,
+                    kost.name,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.2),
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          kost.facilities.replaceAll(',', ' •'),
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        CurrencyFormatter.toShortIDR(kost.minPrice),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -459,7 +532,7 @@ class _LoadMoreSliver extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: const BorderSide(color: AppColors.primary),
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: const Text('MUAT LEBIH BANYAK', style: TextStyle(fontWeight: FontWeight.bold)),

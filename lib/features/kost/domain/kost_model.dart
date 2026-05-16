@@ -50,15 +50,26 @@ class RoomModel {
   final String roomNumber;
   final String price;
   final String status;
+  final List<String> images;
 
-  RoomModel({required this.id, required this.roomNumber, required this.price, required this.status});
+  RoomModel({
+    required this.id, 
+    required this.roomNumber, 
+    required this.price, 
+    required this.status,
+    required this.images,
+  });
 
   factory RoomModel.fromJson(Map<String, dynamic> json) {
+    var imgList = json['images'] as List? ?? [];
+    List<String> imageUrls = imgList.map((i) => i['image'].toString()).toList();
+
     return RoomModel(
       id: json['id'] ?? 0,
       roomNumber: json['room_number'] ?? '',
       price: json['price']?.toString() ?? '0',
       status: json['status'] ?? 'available',
+      images: imageUrls,
     );
   }
 }

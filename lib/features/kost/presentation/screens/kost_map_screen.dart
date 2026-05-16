@@ -102,15 +102,10 @@ class KostMapScreen extends StatelessWidget {
             left: 24,
             right: 24,
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -127,7 +122,7 @@ class KostMapScreen extends StatelessWidget {
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 2.0,
-                            color: AppColors.textSecondary,
+                            color: AppColors.primary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -136,7 +131,7 @@ class KostMapScreen extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
+                            color: AppColors.textPrimary,
                             height: 1.2,
                           ),
                         ),
@@ -145,9 +140,11 @@ class KostMapScreen extends StatelessWidget {
                           children: [
                             const Icon(Icons.location_on_outlined, size: 16, color: AppColors.textSecondary),
                             const SizedBox(width: 8),
-                            Text(
-                              '${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}',
-                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                            Expanded(
+                              child: Text(
+                                '${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}',
+                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                              ),
                             ),
                           ],
                         ),
