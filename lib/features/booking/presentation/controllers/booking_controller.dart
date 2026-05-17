@@ -9,7 +9,15 @@ import '../../domain/booking_models.dart';
 final paymentMethodsProvider = FutureProvider.family<List<PaymentMethodModel>, int>((ref, kostId) async {
   final repo = ref.watch(bookingRepositoryProvider);
   final res = await repo.getPaymentMethods(kostId);
-  return (res.data as List).map((e) => PaymentMethodModel.fromJson(e)).toList();
+  
+  List<dynamic> rawData;
+  if (res.data is Map<String, dynamic> && (res.data as Map<String, dynamic>).containsKey('results')) {
+    rawData = res.data['results'] as List<dynamic>;
+  } else {
+    rawData = res.data as List<dynamic>;
+  }
+  
+  return rawData.map((e) => PaymentMethodModel.fromJson(e)).toList();
 });
 
 final bookingControllerProvider = StateNotifierProvider<BookingController, AsyncValue<BookingModel?>>((ref) {

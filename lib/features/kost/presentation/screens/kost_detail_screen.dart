@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/kost_list_controller.dart';
 import '../../domain/kost_model.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../widgets/inline_booking_form.dart';
+import '../../../booking/presentation/controllers/booking_controller.dart';
 
 final selectedRoomIdProvider = StateProvider.autoDispose<int?>((ref) => null);
+final bookingStartDateProvider = StateProvider.autoDispose<DateTime?>((ref) => null);
+final bookingDurationProvider = StateProvider.autoDispose<int>((ref) => 1);
 
 class KostDetailScreen extends ConsumerStatefulWidget {
   final int id;
@@ -389,65 +394,71 @@ class _RoomsSelectionSliver extends ConsumerWidget {
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _RoomImageCarousel(images: room.images),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _RoomImageCarousel(images: room.images),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: Text(
-                                          'Kamar ${room.roomNumber}',
-                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                                        ),
-                                      ),
-                                      if (!isAvailable)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.error,
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: const Text('Penuh', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                                        ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      RichText(
-                                        text: TextSpan(
-                                          text: CurrencyFormatter.toIDR(room.price),
-                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
-                                          children: const [
-                                            TextSpan(
-                                              text: '/bln',
-                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: AppColors.textSecondary),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Kamar ${room.roomNumber}',
+                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                          if (!isAvailable)
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.error,
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: const Text('Penuh', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                            ),
+                                        ],
                                       ),
-                                      if (isAvailable)
-                                        Icon(
-                                          isSelected ? Icons.check_circle : Icons.add_circle_outline,
-                                          color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                                          size: 24,
-                                        ),
+                                      const SizedBox(height: 16),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          RichText(
+                                            text: TextSpan(
+                                              text: CurrencyFormatter.toIDR(room.price),
+                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                              children: const [
+                                                TextSpan(
+                                                  text: '/bln',
+                                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: AppColors.textSecondary),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (isAvailable)
+                                            Icon(
+                                              isSelected ? Icons.check_circle : Icons.add_circle_outline,
+                                              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                                              size: 24,
+                                            ),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
+                          if (isSelected) const InlineBookingForm(),
                         ],
                       ),
                     ),
@@ -618,6 +629,21 @@ class _StickyBottomBar extends ConsumerWidget {
       } catch (_) {}
     }
 
+    final isLoading = ref.watch(bookingControllerProvider).isLoading;
+    final duration = ref.watch(bookingDurationProvider);
+    final startDate = ref.watch(bookingStartDateProvider);
+    
+    double totalPriceVal = 0;
+    if (selectedRoom != null) {
+      totalPriceVal = double.parse(selectedRoom.price) * duration;
+    }
+
+    ref.listen<AsyncValue>(bookingControllerProvider, (_, state) {
+      if (!state.isLoading && state.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.error.toString(), style: const TextStyle(color: Colors.white)), backgroundColor: AppColors.error));
+      }
+    });
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: const BoxDecoration(
@@ -636,17 +662,17 @@ class _StickyBottomBar extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    selectedRoom != null ? 'Total' : 'Mulai dari',
+                    selectedRoom != null ? 'Total Tagihan' : 'Mulai dari',
                     style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                   ),
                   RichText(
                     text: TextSpan(
-                      text: CurrencyFormatter.toIDR(selectedRoom != null ? selectedRoom.price : kost.minPrice),
+                      text: CurrencyFormatter.toIDR(selectedRoom != null ? totalPriceVal : kost.minPrice),
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
-                      children: const [
+                      children: [
                         TextSpan(
-                          text: '/bln',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: AppColors.textPrimary),
+                          text: selectedRoom != null ? '' : '/bln',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: AppColors.textPrimary),
                         ),
                       ],
                     ),
@@ -656,12 +682,20 @@ class _StickyBottomBar extends ConsumerWidget {
             ),
             const SizedBox(width: 16),
             ElevatedButton(
-              onPressed: () {
+              onPressed: isLoading ? null : () async {
                 if (selectedRoom != null) {
-                  context.push('/booking/${selectedRoom.id}', extra: {
-                    'kostId': kost.id,
-                    'roomPrice': double.parse(selectedRoom.price)
-                  });
+                  if (startDate == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pilih tanggal mulai terlebih dahulu.'), backgroundColor: AppColors.error));
+                    return;
+                  }
+                  
+                  final formattedDate = DateFormat('yyyy-MM-dd').format(startDate);
+                  final notifier = ref.read(bookingControllerProvider.notifier);
+                  final booking = await notifier.createBooking(selectedRoom.id, formattedDate, duration);
+                  
+                  if (booking != null && context.mounted) {
+                    context.push('/payment/${booking.id}/${kost.id}', extra: booking.totalPrice);
+                  }
                 } else {
                   onScrollToRooms();
                 }
@@ -669,10 +703,12 @@ class _StickyBottomBar extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
-              child: Text(
-                selectedRoom != null ? 'Pesan Sekarang' : 'Pilih Kamar',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              ),
+              child: isLoading 
+                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                : Text(
+                    selectedRoom != null ? 'Pesan Sekarang' : 'Pilih Kamar',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
             ),
           ],
         ),
