@@ -12,6 +12,7 @@ import '../../features/kost/presentation/screens/kost_detail_screen.dart';
 import '../../features/kost/presentation/screens/kost_map_screen.dart';
 
 import '../../features/booking/presentation/screens/payment_screen.dart';
+import '../../features/booking/presentation/screens/booking_history_screen.dart';
 
 import '../../features/profile/presentation/screens/profile_screen.dart';
 
@@ -24,7 +25,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     redirect: (context, state) {
       final isGoingToLogin = state.matchedLocation == '/login';
-      final requiresAuth = state.matchedLocation.startsWith('/booking') || state.matchedLocation.startsWith('/profile');
+      final requiresAuth = state.matchedLocation.startsWith('/payment') || state.matchedLocation.startsWith('/history') || state.matchedLocation.startsWith('/profile');
 
       if (!isLoggedIn && requiresAuth) return '/login';
       if (isLoggedIn && isGoingToLogin) return '/';
@@ -72,6 +73,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/history',
+        builder: (context, state) => const BookingHistoryScreen(),
       ),
       GoRoute(
         path: '/payment/:bookingId/:kostId',

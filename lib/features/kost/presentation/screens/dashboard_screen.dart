@@ -38,7 +38,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _onBottomNavTapped(int index) {
-    if (index == 3) {
+    if (index == 2) {
+      context.push('/history');
+    } else if (index == 3) {
       context.push('/profile');
     } else {
       setState(() {
