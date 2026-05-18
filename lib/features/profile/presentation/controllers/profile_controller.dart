@@ -15,11 +15,26 @@ class ProfileController extends StateNotifier<AsyncValue<UserModel?>> {
   final SecureStorageService _storage;
   final Ref _ref;
 
-  ProfileController(this._repository, this._storage, this._ref) : super(const AsyncValue.loading()) {
-    fetchProfile();
+  ProfileController(this._repository, this._storage, this._ref) : super(const AsyncValue.data(null)) {
+    _ref.listen<bool>(authStateProvider, (previous, next) {
+      if (next == true) {
+        fetchProfile();
+      } else {
+        state = const AsyncValue.data(null);
+      }
+    });
+
+    if (_ref.read(authStateProvider)) {
+      fetchProfile();
+    }
   }
 
   Future<void> fetchProfile() async {
+    if (!_ref.read(authStateProvider)) {
+      state = const AsyncValue.data(null);
+      return;
+    }
+
     try {
       final response = await _repository.getProfile();
       state = AsyncValue.data(UserModel.fromJson(response.data));
@@ -43,6 +58,7 @@ class ProfileController extends StateNotifier<AsyncValue<UserModel?>> {
 
   Future<void> logout() async {
     await _storage.clearAll();
+    state = const AsyncValue.data(null);
     _ref.read(authStateProvider.notifier).state = false;
   }
 }
