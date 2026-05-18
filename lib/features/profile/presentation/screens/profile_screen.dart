@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../controllers/profile_controller.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/user_model.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -28,8 +29,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (success && mounted) {
       setState(() => _isEditing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil berhasil diperbarui'), backgroundColor: Colors.black),
+      NotificationUtils.show(
+        context,
+        message: 'Profil berhasil diperbarui',
       );
     }
   }
@@ -53,7 +55,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final isLoading = profileState.isLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.surface, // Clean white background for mobile flow
+      backgroundColor: AppColors.surface,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,

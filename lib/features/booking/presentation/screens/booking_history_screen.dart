@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../controllers/booking_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 class BookingHistoryScreen extends ConsumerWidget {
   const BookingHistoryScreen({super.key});
@@ -77,8 +78,10 @@ class BookingHistoryScreen extends ConsumerWidget {
                     if (booking.status == 'pending_payment') {
                       context.push('/payment/${booking.id}/${booking.kostId}', extra: booking.totalPrice);
                     } else if (booking.paymentProof != null) {
-                       ScaffoldMessenger.of(context).showSnackBar(
-                         const SnackBar(content: Text('Bukti pembayaran sedang diproses atau sudah diverifikasi.'))
+                       NotificationUtils.show(
+                         context,
+                         message: 'Bukti pembayaran sedang diproses atau sudah diverifikasi.',
+                         type: SnackBarType.info,
                        );
                     }
                   },

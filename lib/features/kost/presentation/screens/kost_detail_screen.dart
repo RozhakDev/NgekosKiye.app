@@ -8,6 +8,7 @@ import '../controllers/kost_list_controller.dart';
 import '../../domain/kost_model.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../widgets/inline_booking_form.dart';
 import '../../../booking/presentation/controllers/booking_controller.dart';
 import '../../presentation/controllers/favorite_controller.dart';
@@ -133,11 +134,9 @@ class _ImageGallerySliverState extends ConsumerState<_ImageGallerySliver> {
                       onTap: () {
                         ref.read(favoriteProvider.notifier).toggleFavorite(widget.kost.id);
                         ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(isFav ? 'Dihapus dari favorit' : 'Disimpan ke favorit'),
-                            duration: const Duration(seconds: 1),
-                          ),
+                        NotificationUtils.show(
+                          context,
+                          message: isFav ? 'Dihapus dari favorit' : 'Disimpan ke favorit',
                         );
                       },
                     ),
@@ -645,7 +644,11 @@ class _StickyBottomBar extends ConsumerWidget {
 
     ref.listen<AsyncValue>(bookingControllerProvider, (_, state) {
       if (!state.isLoading && state.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.error.toString(), style: const TextStyle(color: Colors.white)), backgroundColor: AppColors.error));
+        NotificationUtils.show(
+          context,
+          message: state.error.toString(),
+          type: SnackBarType.error,
+        );
       }
     });
 
@@ -690,7 +693,11 @@ class _StickyBottomBar extends ConsumerWidget {
               onPressed: isLoading ? null : () async {
                 if (selectedRoom != null) {
                   if (startDate == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pilih tanggal mulai terlebih dahulu.'), backgroundColor: AppColors.error));
+                    NotificationUtils.show(
+                      context,
+                      message: 'Pilih tanggal mulai terlebih dahulu.',
+                      type: SnackBarType.error,
+                    );
                     return;
                   }
                   

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../controllers/booking_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -38,18 +39,29 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
   void _uploadPayment() async {
     if (_selectedMethodId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pilih metode pembayaran terlebih dahulu.'), backgroundColor: AppColors.error));
+      NotificationUtils.show(
+        context,
+        message: 'Pilih metode pembayaran terlebih dahulu.',
+        type: SnackBarType.error,
+      );
       return;
     }
     if (_selectedImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Unggah bukti pembayaran terlebih dahulu.'), backgroundColor: AppColors.error));
+      NotificationUtils.show(
+        context,
+        message: 'Unggah bukti pembayaran terlebih dahulu.',
+        type: SnackBarType.error,
+      );
       return;
     }
     
     final success = await ref.read(bookingControllerProvider.notifier).uploadPayment(widget.bookingId, _selectedImage!);
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bukti berhasil diunggah. Menunggu verifikasi.'), backgroundColor: Colors.black));
+      NotificationUtils.show(
+        context,
+        message: 'Bukti berhasil diunggah. Menunggu verifikasi.',
+      );
       context.go('/');
     }
   }

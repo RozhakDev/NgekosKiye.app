@@ -37,7 +37,7 @@ class NotificationService {
       'NgekosKiye Notifications',
       importance: Importance.max,
       priority: Priority.high,
-      color: Color(0xFF000000),
+      color: Color(0xFFF95D18),
     );
     const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
 

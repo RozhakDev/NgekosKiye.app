@@ -6,6 +6,7 @@ import '../controllers/kost_list_controller.dart';
 import '../../domain/kost_model.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../widgets/home_search_bar.dart';
 import '../widgets/home_drawer.dart';
 
@@ -137,7 +138,7 @@ class _DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.notifications_none, color: Colors.white),
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notifikasi ditekan')));
+            NotificationUtils.show(context, message: 'Belum ada notifikasi baru');
           },
         ),
       ],

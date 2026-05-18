@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../profile/presentation/controllers/profile_controller.dart';
 
 class HomeDrawer extends ConsumerWidget {
@@ -54,7 +55,7 @@ class HomeDrawer extends ConsumerWidget {
                   title: const Text('Syarat & Ketentuan', style: TextStyle(color: AppColors.textPrimary)),
                   onTap: () {
                     context.pop();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Syarat & Ketentuan segera hadir.')));
+                    NotificationUtils.show(context, message: 'Syarat & Ketentuan segera hadir.');
                   },
                 ),
                 ListTile(
@@ -62,7 +63,7 @@ class HomeDrawer extends ConsumerWidget {
                   title: const Text('Pusat Bantuan', style: TextStyle(color: AppColors.textPrimary)),
                   onTap: () {
                     context.pop();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pusat Bantuan segera hadir.')));
+                    NotificationUtils.show(context, message: 'Pusat Bantuan segera hadir.');
                   },
                 ),
                 ListTile(
@@ -70,7 +71,7 @@ class HomeDrawer extends ConsumerWidget {
                   title: const Text('Kebijakan Privasi', style: TextStyle(color: AppColors.textPrimary)),
                   onTap: () {
                     context.pop();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kebijakan Privasi segera hadir.')));
+                    NotificationUtils.show(context, message: 'Kebijakan Privasi segera hadir.');
                   },
                 ),
                 ListTile(
@@ -82,7 +83,7 @@ class HomeDrawer extends ConsumerWidget {
                       context: context,
                       applicationName: 'NgekosKiye',
                       applicationVersion: '1.0.0',
-                      applicationLegalese: '© 2026 Ngekost.id',
+                      applicationLegalese: '© 2026 NgekosKiye.app',
                     );
                   },
                 ),

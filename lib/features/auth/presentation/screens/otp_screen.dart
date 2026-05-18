@@ -7,6 +7,7 @@ import 'package:pinput/pinput.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../controllers/auth_controller.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
   final String email;
@@ -72,8 +73,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     await notifier.verifyOtp(widget.email, _otpCtrl.text.trim());
 
     if (mounted && !ref.read(authControllerProvider).hasError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Verifikasi sukses. Silakan masuk.'), backgroundColor: Colors.black),
+      NotificationUtils.show(
+        context,
+        message: 'Verifikasi sukses. Silakan masuk.',
+        type: SnackBarType.success,
       );
       context.go('/login');
     }
@@ -87,8 +90,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
     if (mounted && !ref.read(authControllerProvider).hasError) {
       _startTimer();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP telah dikirim ulang.'), backgroundColor: Colors.black),
+      NotificationUtils.show(
+        context,
+        message: 'OTP telah dikirim ulang.',
       );
     }
   }
@@ -97,8 +101,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {
       if (!state.isLoading && state.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(state.error.toString(), style: const TextStyle(color: Colors.white)), backgroundColor: AppColors.error),
+        NotificationUtils.show(
+          context,
+          message: state.error.toString(),
+          type: SnackBarType.error,
         );
       }
     });

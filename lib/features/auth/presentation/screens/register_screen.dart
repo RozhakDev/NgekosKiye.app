@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../controllers/auth_controller.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -31,8 +32,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   void _register() async {
     if (!_agreedToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Anda harus menyetujui Syarat & Ketentuan.'), backgroundColor: AppColors.error),
+      NotificationUtils.show(
+        context,
+        message: 'Anda harus menyetujui Syarat & Ketentuan.',
+        type: SnackBarType.error,
       );
       return;
     }
@@ -48,8 +51,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     await notifier.register(data);
 
     if (mounted && !ref.read(authControllerProvider).hasError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registrasi sukses. Silakan cek email untuk OTP.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.black),
+      NotificationUtils.show(
+        context,
+        message: 'Registrasi sukses. Silakan cek email untuk OTP.',
+        type: SnackBarType.success,
       );
       final email = Uri.encodeComponent(_emailCtrl.text.trim());
       context.push('/otp?email=$email');
@@ -60,8 +65,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {
       if (!state.isLoading && state.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(state.error.toString(), style: const TextStyle(color: Colors.white)), backgroundColor: AppColors.error),
+        NotificationUtils.show(
+          context,
+          message: state.error.toString(),
+          type: SnackBarType.error,
         );
       }
     });

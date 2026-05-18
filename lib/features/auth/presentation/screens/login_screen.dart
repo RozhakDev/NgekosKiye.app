@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../controllers/auth_controller.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -38,26 +39,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {
       if (!state.isLoading && state.hasError) {
         final errorMsg = state.error.toString();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMsg, style: const TextStyle(color: Colors.white)),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            action: errorMsg.toLowerCase().contains('belum diverifikasi') ? SnackBarAction(
-              label: 'Verifikasi',
-              textColor: Colors.white,
-              onPressed: () {
-                final input = _emailController.text.trim();
-                if (input.contains('@')) {
-                  context.push('/otp?email=${Uri.encodeComponent(input)}');
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Silakan login menggunakan email untuk melanjutkan verifikasi.', style: TextStyle(color: Colors.white)), backgroundColor: AppColors.error),
-                  );
-                }
-              },
-            ) : null,
-          ),
+        NotificationUtils.show(
+          context,
+          message: errorMsg,
+          type: SnackBarType.error,
+          action: errorMsg.toLowerCase().contains('belum diverifikasi') ? SnackBarAction(
+            label: 'Verifikasi',
+            textColor: Colors.white,
+            onPressed: () {
+              final input = _emailController.text.trim();
+              if (input.contains('@')) {
+                context.push('/otp?email=${Uri.encodeComponent(input)}');
+              } else {
+                NotificationUtils.show(
+                  context,
+                  message: 'Silakan login menggunakan email untuk melanjutkan verifikasi.',
+                  type: SnackBarType.error,
+                );
+              }
+            },
+          ) : null,
         );
       }
     });
@@ -139,8 +140,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Fitur Lupa Kata Sandi segera hadir.')),
+                    NotificationUtils.show(
+                      context,
+                      message: 'Fitur Lupa Kata Sandi segera hadir.',
                     );
                   },
                   style: TextButton.styleFrom(
