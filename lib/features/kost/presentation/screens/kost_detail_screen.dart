@@ -10,6 +10,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../widgets/inline_booking_form.dart';
 import '../../../booking/presentation/controllers/booking_controller.dart';
+import '../../presentation/controllers/favorite_controller.dart';
 
 final selectedRoomIdProvider = StateProvider.autoDispose<int?>((ref) => null);
 final bookingStartDateProvider = StateProvider.autoDispose<DateTime?>((ref) => null);
@@ -49,7 +50,7 @@ class _KostDetailScreenState extends ConsumerState<KostDetailScreen> {
           controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            _ImageGallerySliver(images: kost.images),
+            _ImageGallerySliver(kost: kost),
             _TitleLocationSliver(kost: kost),
             const _ThickDividerSliver(),
             _FacilitiesSliver(facilitiesStr: kost.facilities),
@@ -73,28 +74,31 @@ class _KostDetailScreenState extends ConsumerState<KostDetailScreen> {
   }
 }
 
-class _ImageGallerySliver extends StatefulWidget {
-  final List<String> images;
-  const _ImageGallerySliver({required this.images});
+class _ImageGallerySliver extends ConsumerStatefulWidget {
+  final KostModel kost;
+  const _ImageGallerySliver({required this.kost});
 
   @override
-  State<_ImageGallerySliver> createState() => _ImageGallerySliverState();
+  ConsumerState<_ImageGallerySliver> createState() => _ImageGallerySliverState();
 }
 
-class _ImageGallerySliverState extends State<_ImageGallerySliver> {
+class _ImageGallerySliverState extends ConsumerState<_ImageGallerySliver> {
   int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final images = widget.kost.images;
+    final isFav = ref.watch(favoriteProvider).contains(widget.kost.id);
+
     return SliverToBoxAdapter(
       child: Stack(
         children: [
           AspectRatio(
             aspectRatio: 4 / 3,
-            child: widget.images.isEmpty
+            child: images.isEmpty
                 ? Container(color: Colors.grey[300])
                 : PageView.builder(
-                    itemCount: widget.images.length,
+                    itemCount: images.length,
                     onPageChanged: (index) {
                       setState(() {
                         _currentIndex = index;
@@ -102,9 +106,9 @@ class _ImageGallerySliverState extends State<_ImageGallerySliver> {
                     },
                     itemBuilder: (context, index) {
                       return Image.network(
-                        widget.images[index],
+                        images[index],
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(color: Colors.grey[300]),
+                        errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[300]),
                       );
                     },
                   ),
@@ -124,16 +128,17 @@ class _ImageGallerySliverState extends State<_ImageGallerySliver> {
                 Row(
                   children: [
                     _buildCircularBtn(
-                      icon: Icons.favorite_border,
+                      icon: isFav ? Icons.favorite : Icons.favorite_border,
+                      iconColor: isFav ? AppColors.error : AppColors.textPrimary,
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Disimpan ke favorit')));
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    _buildCircularBtn(
-                      icon: Icons.share_outlined,
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Membagikan...')));
+                        ref.read(favoriteProvider.notifier).toggleFavorite(widget.kost.id);
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(isFav ? 'Dihapus dari favorit' : 'Disimpan ke favorit'),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -142,7 +147,7 @@ class _ImageGallerySliverState extends State<_ImageGallerySliver> {
             ),
           ),
 
-          if (widget.images.length > 1)
+          if (images.length > 1)
             Positioned(
               bottom: 16,
               right: 16,
@@ -153,7 +158,7 @@ class _ImageGallerySliverState extends State<_ImageGallerySliver> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  '${_currentIndex + 1}/${widget.images.length}',
+                  '${_currentIndex + 1}/${images.length}',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -167,7 +172,7 @@ class _ImageGallerySliverState extends State<_ImageGallerySliver> {
     );
   }
 
-  Widget _buildCircularBtn({required IconData icon, required VoidCallback onTap}) {
+  Widget _buildCircularBtn({required IconData icon, Color iconColor = AppColors.textPrimary, required VoidCallback onTap}) {
     return Material(
       color: Colors.white,
       shape: const CircleBorder(),
@@ -177,7 +182,7 @@ class _ImageGallerySliverState extends State<_ImageGallerySliver> {
         customBorder: const CircleBorder(),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Icon(icon, color: AppColors.textPrimary, size: 20),
+          child: Icon(icon, color: iconColor, size: 20),
         ),
       ),
     );

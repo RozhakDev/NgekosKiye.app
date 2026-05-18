@@ -47,8 +47,16 @@ class KostListController extends StateNotifier<KostListState> {
 
     try {
       final response = await _repository.getKosts(page: state.page);
-      final List results = response.data['results'];
-      final next = response.data['next'];
+      
+      List<dynamic> results;
+      dynamic next;
+      if (response.data is Map<String, dynamic> && (response.data as Map<String, dynamic>).containsKey('results')) {
+        results = response.data['results'] as List<dynamic>;
+        next = response.data['next'];
+      } else {
+        results = response.data as List<dynamic>;
+        next = null;
+      }
 
       final List<KostModel> newKosts = results.map((json) => KostModel.fromJson(json)).toList();
 
