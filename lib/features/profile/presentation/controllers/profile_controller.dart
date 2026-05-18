@@ -24,7 +24,7 @@ class ProfileController extends StateNotifier<AsyncValue<UserModel?>> {
       final response = await _repository.getProfile();
       state = AsyncValue.data(UserModel.fromJson(response.data));
     } catch (e, st) {
-      state = AsyncValue.error('Gagal memuat profil', st);
+      state = AsyncValue.error('Gagal memuat profil: $e', st);
     }
   }
 
@@ -32,10 +32,11 @@ class ProfileController extends StateNotifier<AsyncValue<UserModel?>> {
     state = const AsyncValue.loading();
     try {
       final response = await _repository.updateProfile(data);
-      state = AsyncValue.data(UserModel.fromJson(response.data));
+      final responseData = response.data['data'] ?? response.data;
+      state = AsyncValue.data(UserModel.fromJson(responseData));
       return true;
     } catch (e, st) {
-      state = AsyncValue.error('Gagal memperbarui profil', st);
+      state = AsyncValue.error('Gagal memperbarui profil: $e', st);
       return false;
     }
   }
