@@ -6,6 +6,7 @@ import '../controllers/kost_list_controller.dart';
 import '../../domain/kost_model.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../widgets/home_search_bar.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -38,7 +39,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _onBottomNavTapped(int index) {
-    if (index == 2) {
+    if (index == 1) {
+      context.push('/search');
+    } else if (index == 2) {
       context.push('/history');
     } else if (index == 3) {
       context.push('/profile');
@@ -85,7 +88,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
-        const _SearchBarSliver(),
+        const HomeSearchBarSliver(),
         const _PromoSliderSliver(),
         const _PopularLocationsSliver(),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
@@ -166,42 +169,6 @@ class _DashboardBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Riwayat'),
         BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profil'),
       ],
-    );
-  }
-}
-
-class _SearchBarSliver extends StatelessWidget {
-  const _SearchBarSliver();
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        color: AppColors.primary,
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: const TextField(
-          decoration: InputDecoration(
-            hintText: 'Cari kos di kota mana?',
-            hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-            prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
-            contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

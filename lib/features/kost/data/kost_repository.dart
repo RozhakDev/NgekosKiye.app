@@ -12,8 +12,12 @@ class KostRepository {
 
   KostRepository(this._dio);
 
-  Future<Response> getKosts({int page = 1}) async {
-    return await _dio.get('/kosts/', queryParameters: {'page': page});
+  Future<Response> getKosts({int page = 1, String? search}) async {
+    final Map<String, dynamic> query = {'page': page};
+    if (search != null && search.isNotEmpty) {
+      query['search'] = search;
+    }
+    return await _dio.get('/kosts/', queryParameters: query);
   }
 
   Future<Response> getKostDetail(int id) async {

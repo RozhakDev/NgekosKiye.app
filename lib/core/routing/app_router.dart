@@ -10,6 +10,7 @@ import '../../features/auth/presentation/screens/otp_screen.dart';
 import '../../features/kost/presentation/screens/dashboard_screen.dart';
 import '../../features/kost/presentation/screens/kost_detail_screen.dart';
 import '../../features/kost/presentation/screens/kost_map_screen.dart';
+import '../../features/kost/presentation/screens/search_screen.dart';
 
 import '../../features/booking/presentation/screens/payment_screen.dart';
 import '../../features/booking/presentation/screens/booking_history_screen.dart';
@@ -69,6 +70,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             title: args['name'],
           );
         },
+      ),
+      GoRoute(
+        path: '/search',
+        builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
         path: '/profile',
