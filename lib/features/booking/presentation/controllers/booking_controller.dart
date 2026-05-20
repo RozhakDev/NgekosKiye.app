@@ -34,6 +34,12 @@ final bookingHistoryProvider = FutureProvider.autoDispose<List<BookingModel>>((r
   return rawData.map((e) => BookingModel.fromJson(e)).toList();
 });
 
+final bookingDetailProvider = FutureProvider.family.autoDispose<BookingModel, int>((ref, id) async {
+  final repo = ref.watch(bookingRepositoryProvider);
+  final res = await repo.getBookingDetail(id);
+  return BookingModel.fromJson(res.data);
+});
+
 final bookingControllerProvider = StateNotifierProvider<BookingController, AsyncValue<BookingModel?>>((ref) {
   return BookingController(ref.watch(bookingRepositoryProvider));
 });

@@ -15,6 +15,7 @@ import '../../features/kost/presentation/screens/search_screen.dart';
 import '../../features/booking/presentation/screens/payment_screen.dart';
 import '../../features/booking/presentation/screens/payment_success_screen.dart';
 import '../../features/booking/presentation/screens/booking_history_screen.dart';
+import '../../features/booking/presentation/screens/booking_detail_screen.dart';
 
 import '../../features/profile/presentation/screens/profile_screen.dart';
 
@@ -90,6 +91,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/history',
         builder: (context, state) => const BookingHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/booking-detail/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return BookingDetailScreen(id: id);
+        },
       ),
       GoRoute(
         path: '/payment/:bookingId/:kostId',

@@ -17,10 +17,10 @@ class BookingHistoryScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
         title: const Text(
@@ -28,7 +28,7 @@ class BookingHistoryScreen extends ConsumerWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -77,12 +77,8 @@ class BookingHistoryScreen extends ConsumerWidget {
                   onTap: () {
                     if (booking.status == 'pending_payment') {
                       context.push('/payment/${booking.id}/${booking.kostId}', extra: booking.totalPrice);
-                    } else if (booking.paymentProof != null) {
-                       NotificationUtils.show(
-                         context,
-                         message: 'Bukti pembayaran sedang diproses atau sudah diverifikasi.',
-                         type: SnackBarType.info,
-                       );
+                    } else {
+                      context.push('/booking-detail/${booking.id}');
                     }
                   },
                   child: Container(

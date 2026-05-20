@@ -17,6 +17,10 @@ class BookingRepository {
     return await _dio.get('/bookings/');
   }
 
+  Future<Response> getBookingDetail(int id) async {
+    return await _dio.get('/bookings/$id/');
+  }
+
   Future<Response> getPaymentMethods(int kostId) async {
     return await _dio.get('/kosts/$kostId/payment-methods/');
   }
