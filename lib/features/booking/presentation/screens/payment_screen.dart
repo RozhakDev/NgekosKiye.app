@@ -58,11 +58,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     final success = await ref.read(bookingControllerProvider.notifier).uploadPayment(widget.bookingId, _selectedImage!);
 
     if (success && mounted) {
-      NotificationUtils.show(
-        context,
-        message: 'Bukti berhasil diunggah. Menunggu verifikasi.',
-      );
-      context.go('/');
+      context.go('/payment-success', extra: widget.totalPrice);
     }
   }
 

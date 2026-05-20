@@ -13,6 +13,7 @@ import '../../features/kost/presentation/screens/kost_map_screen.dart';
 import '../../features/kost/presentation/screens/search_screen.dart';
 
 import '../../features/booking/presentation/screens/payment_screen.dart';
+import '../../features/booking/presentation/screens/payment_success_screen.dart';
 import '../../features/booking/presentation/screens/booking_history_screen.dart';
 
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -74,6 +75,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/search',
         builder: (context, state) => const SearchScreen(),
+      ),
+      GoRoute(
+        path: '/payment-success',
+        builder: (context, state) {
+          final totalPrice = state.extra as String? ?? '0';
+          return PaymentSuccessScreen(totalPrice: totalPrice);
+        },
       ),
       GoRoute(
         path: '/profile',
