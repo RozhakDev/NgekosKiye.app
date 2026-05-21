@@ -6,6 +6,7 @@ import '../controllers/booking_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/custom_empty_state.dart';
 
 class BookingHistoryScreen extends ConsumerWidget {
   const BookingHistoryScreen({super.key});
@@ -181,7 +182,10 @@ class BookingHistoryScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (err, _) => Center(child: Text('Gagal memuat riwayat: $err')),
+        error: (err, _) => CustomEmptyState(
+          message: 'Gagal memuat riwayat: $err',
+          onRetry: () => ref.refresh(bookingHistoryProvider.future),
+        ),
       ),
     );
   }

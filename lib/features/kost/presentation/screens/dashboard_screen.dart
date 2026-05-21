@@ -7,6 +7,7 @@ import '../../domain/kost_model.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/custom_empty_state.dart';
 import '../widgets/home_search_bar.dart';
 import '../widgets/home_drawer.dart';
 
@@ -84,7 +85,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     if (state.error != null && state.kosts.isEmpty) {
-      return Center(child: Text(state.error!));
+      return CustomEmptyState(
+        message: state.error!,
+        onRetry: _onRefresh,
+      );
     }
 
     return CustomScrollView(

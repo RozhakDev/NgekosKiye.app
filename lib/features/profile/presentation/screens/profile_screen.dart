@@ -6,6 +6,7 @@ import '../controllers/profile_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/user_model.dart';
+import '../../../../core/widgets/custom_empty_state.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -76,7 +77,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: profileState.when(
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('Data profil tidak ditemukan.'));
+            return CustomEmptyState(
+              message: 'Data profil tidak ditemukan.',
+              icon: Icons.person_off_outlined,
+              onRetry: () => ref.read(profileControllerProvider.notifier).fetchProfile(),
+            );
           }
 
           return SafeArea(
