@@ -80,4 +80,36 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
       state = AsyncValue.error('Terjadi kesalahan jaringan', st);
     }
   }
+
+  Future<bool> forgotPassword(String email) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.forgotPassword(email);
+      state = const AsyncValue.data(null);
+      return true;
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data['pesan'] ?? 'Gagal memproses permintaan.';
+      state = AsyncValue.error(errorMsg, e.stackTrace);
+      return false;
+    } catch (e, st) {
+      state = AsyncValue.error('Terjadi kesalahan jaringan', st);
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword(String email, String otp, String password) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.resetPassword(email, otp, password);
+      state = const AsyncValue.data(null);
+      return true;
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data['pesan'] ?? 'Gagal mereset kata sandi.';
+      state = AsyncValue.error(errorMsg, e.stackTrace);
+      return false;
+    } catch (e, st) {
+      state = AsyncValue.error('Terjadi kesalahan jaringan', st);
+      return false;
+    }
+  }
 }

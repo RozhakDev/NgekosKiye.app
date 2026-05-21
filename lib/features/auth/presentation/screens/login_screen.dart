@@ -140,10 +140,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    NotificationUtils.show(
-                      context,
-                      message: 'Fitur Lupa Kata Sandi segera hadir.',
-                    );
+                    context.push('/forgot-password');
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.primary,
@@ -152,8 +149,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: const Text('Lupa Kata Sandi?', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
+                ),              ),
               const SizedBox(height: 48),
               
               ElevatedButton(

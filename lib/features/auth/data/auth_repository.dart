@@ -35,4 +35,19 @@ class AuthRepository {
       'email': email,
     });
   }
+
+  Future<Response> forgotPassword(String email) async {
+    return await _dio.post('/users/auth/forgot-password/', data: {
+      'email': email,
+    });
+  }
+
+  Future<Response> resetPassword(String email, String otp, String password) async {
+    return await _dio.post('/users/auth/reset-password/', data: {
+      'email': email,
+      'otp': otp,
+      'password': password,
+      'password_confirm': password,
+    });
+  }
 }
