@@ -9,14 +9,15 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
-  const SearchScreen({super.key});
+  final String? initialQuery;
+  const SearchScreen({super.key, this.initialQuery});
 
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
-  final TextEditingController _searchController = TextEditingController();
+  late final TextEditingController _searchController;
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
   final FocusNode _focusNode = FocusNode();
@@ -24,9 +25,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    _searchController = TextEditingController(text: widget.initialQuery);
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
+      if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
+        ref.read(search_ctrl.searchControllerProvider.notifier).search(widget.initialQuery!);
+      } else {
+        _focusNode.requestFocus();
+      }
     });
   }
 

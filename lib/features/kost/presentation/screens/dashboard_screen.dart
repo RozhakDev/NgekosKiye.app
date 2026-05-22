@@ -99,7 +99,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         const _PromoSliderSliver(),
         const _PopularLocationsSliver(),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
-        const _SectionTitleSliver(title: 'Rekomendasi Kost', actionText: 'LIHAT SEMUA'),
+        const _SectionTitleSliver(title: 'Kost Terbaru', actionText: 'LIHAT SEMUA'),
         const _SeparatorLineSliver(),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
         if (state.kosts.isNotEmpty) _KostListSliver(kosts: state.kosts),
@@ -288,17 +288,20 @@ class _PopularLocationsSliver extends StatelessWidget {
               itemCount: locations.length,
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: AppColors.border),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Text(
-                    locations[index],
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+                return GestureDetector(
+                  onTap: () => context.push('/search?query=${Uri.encodeComponent(locations[index])}'),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.border),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Text(
+                      locations[index],
+                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w500),
+                    ),
                   ),
                 );
               },

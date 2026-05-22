@@ -88,7 +88,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/search',
-        builder: (context, state) => const SearchScreen(),
+        builder: (context, state) {
+          final query = state.uri.queryParameters['query'];
+          return SearchScreen(initialQuery: query);
+        },
       ),
       GoRoute(
         path: '/payment-success',
