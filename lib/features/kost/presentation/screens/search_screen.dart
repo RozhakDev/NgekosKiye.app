@@ -80,7 +80,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               decoration: InputDecoration(
                 isDense: true,
                 hintText: 'Cari kost di daerah mana?',
-                hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
                 prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(

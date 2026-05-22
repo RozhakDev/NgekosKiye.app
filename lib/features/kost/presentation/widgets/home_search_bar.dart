@@ -20,13 +20,17 @@ class HomeSearchBarSliver extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.search, color: AppColors.textSecondary),
-                SizedBox(width: 12),
+                const Icon(Icons.search, color: AppColors.textSecondary),
+                const SizedBox(width: 12),
                 Text(
                   'Cari kos di kota mana?',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  style: TextStyle(
+                    color: AppColors.textSecondary.withValues(alpha: 0.5), 
+                    fontSize: 14, 
+                    fontWeight: FontWeight.w400
+                  ),
                 ),
               ],
             ),

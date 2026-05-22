@@ -22,7 +22,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   final _focusNode = FocusNode();
   
   Timer? _timer;
-  int _start = 45;
+  int _start = 60;
   bool _canResend = false;
 
   @override
