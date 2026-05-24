@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../../data/kost_repository.dart';
 import '../../domain/kost_model.dart';
 
+/// Menyimpan state daftar kos, pagination, dan status pemuatan data.
+///
+/// Class ini membantu controller memperbarui UI secara konsisten.
 class KostListState {
   final List<KostModel> kosts;
   final bool isLoading;
@@ -13,6 +16,9 @@ class KostListState {
 
   KostListState({required this.kosts, required this.isLoading, required this.hasMore, required this.page, this.error});
 
+  /// Membuat salinan state dengan nilai tertentu yang diperbarui.
+  ///
+  /// Method ini membantu perubahan state tetap eksplisit dan aman.
   KostListState copyWith({List<KostModel>? kosts, bool? isLoading, bool? hasMore, int? page, String? error}) {
     return KostListState(
       kosts: kosts ?? this.kosts,
@@ -28,6 +34,9 @@ final kostListControllerProvider = StateNotifierProvider<KostListController, Kos
   return KostListController(ref.watch(kostRepositoryProvider));
 });
 
+/// Mengelola pemuatan daftar kos dari repository.
+///
+/// Class ini menangani refresh dan pagination daftar kos.
 class KostListController extends StateNotifier<KostListState> {
   final KostRepository _repository;
 
@@ -36,6 +45,9 @@ class KostListController extends StateNotifier<KostListState> {
     fetchKosts();
   }
 
+  /// Memuat daftar kos dan memperbarui state pagination.
+  ///
+  /// Method ini digunakan untuk refresh dan pemuatan halaman berikutnya.
   Future<void> fetchKosts({bool isRefresh = false}) async {
     if (state.isLoading || (!state.hasMore && !isRefresh)) return;
 

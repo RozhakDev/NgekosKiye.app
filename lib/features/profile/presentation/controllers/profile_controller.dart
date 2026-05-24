@@ -10,6 +10,9 @@ final profileControllerProvider = StateNotifierProvider<ProfileController, Async
   return ProfileController(ref.watch(profileRepositoryProvider), SecureStorageService(), ref);
 });
 
+/// Mengelola pemuatan, pembaruan, dan sesi profil pengguna.
+///
+/// Class ini menghubungkan repository profil dengan tampilan.
 class ProfileController extends StateNotifier<AsyncValue<UserModel?>> {
   final ProfileRepository _repository;
   final SecureStorageService _storage;
@@ -29,6 +32,9 @@ class ProfileController extends StateNotifier<AsyncValue<UserModel?>> {
     }
   }
 
+  /// Memuat profil pengguna dan memperbarui state halaman.
+  ///
+  /// Method ini dipanggil sebelum data profil ditampilkan.
   Future<void> fetchProfile() async {
     if (!_ref.read(authStateProvider)) {
       state = const AsyncValue.data(null);
@@ -43,6 +49,9 @@ class ProfileController extends StateNotifier<AsyncValue<UserModel?>> {
     }
   }
 
+  /// Mengirim perubahan data profil pengguna ke server.
+  ///
+  /// Method ini digunakan saat pengguna menyimpan edit profil.
   Future<bool> updateProfile(Map<String, dynamic> data) async {
     state = const AsyncValue.loading();
     try {
@@ -56,6 +65,9 @@ class ProfileController extends StateNotifier<AsyncValue<UserModel?>> {
     }
   }
 
+  /// Menghapus sesi pengguna dari aplikasi.
+  ///
+  /// Method ini membersihkan data lokal yang berkaitan dengan akun.
   Future<void> logout() async {
     await _storage.clearAll();
     state = const AsyncValue.data(null);

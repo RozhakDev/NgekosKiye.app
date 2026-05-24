@@ -9,6 +9,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 
+/// Menampilkan halaman unggah bukti pembayaran.
+///
+/// Widget ini digunakan setelah pengguna membuat booking.
 class PaymentScreen extends ConsumerStatefulWidget {
   final int bookingId;
   final int kostId;
@@ -21,14 +24,23 @@ class PaymentScreen extends ConsumerStatefulWidget {
     required this.totalPrice,
   });
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<PaymentScreen> createState() => _PaymentScreenState();
 }
 
+/// Mengelola pilihan gambar dan proses unggah bukti pembayaran.
+///
+/// State ini memastikan bukti pembayaran dipilih sebelum dikirim.
 class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   File? _selectedImage;
   int? _selectedMethodId;
 
+  /// Membuka pemilih gambar untuk bukti pembayaran.
+  ///
+  /// Method ini menyimpan file yang dipilih ke state halaman.
   void _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -37,6 +49,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
   }
 
+  /// Mengirim gambar bukti pembayaran yang sudah dipilih.
+  ///
+  /// Method ini menjalankan validasi sederhana sebelum unggahan.
   void _uploadPayment() async {
     if (_selectedMethodId == null) {
       NotificationUtils.show(
@@ -62,6 +77,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final paymentMethodsAsync = ref.watch(paymentMethodsProvider(widget.kostId));

@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 
+/// Menampilkan konfirmasi setelah bukti pembayaran berhasil dikirim.
+///
+/// Widget ini memberi ringkasan status pembayaran kepada pengguna.
 class PaymentSuccessScreen extends StatelessWidget {
   final String totalPrice;
 
@@ -13,6 +16,9 @@ class PaymentSuccessScreen extends StatelessWidget {
     required this.totalPrice,
   });
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
@@ -166,6 +172,9 @@ class PaymentSuccessScreen extends StatelessWidget {
     );
   }
 
+  /// Menampilkan satu baris informasi dengan label dan nilai.
+  ///
+  /// Method ini menjaga format detail tetap konsisten.
   Widget _buildInfoRow(String label, String value, {Color? valueColor, bool isBold = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

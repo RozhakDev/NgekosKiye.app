@@ -6,22 +6,37 @@ import '../controllers/auth_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 
+/// Menampilkan form permintaan pemulihan kata sandi.
+///
+/// Widget ini meminta email pengguna untuk memulai reset akun.
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
+/// Mengelola input email dan proses permintaan reset kata sandi.
+///
+/// State ini mengirim permintaan pemulihan saat data sudah valid.
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _emailCtrl = TextEditingController();
 
+  /// Membersihkan controller dan resource saat halaman tidak digunakan.
+  ///
+  /// Method ini mencegah resource tetap aktif setelah widget ditutup.
   @override
   void dispose() {
     _emailCtrl.dispose();
     super.dispose();
   }
 
+  /// Memvalidasi input lalu menjalankan aksi utama halaman.
+  ///
+  /// Method ini dipakai pada form pemulihan atau reset kata sandi.
   void _submit() async {
     final email = _emailCtrl.text.trim();
     if (email.isEmpty || !email.contains('@')) {
@@ -36,6 +51,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {

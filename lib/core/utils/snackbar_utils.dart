@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Menentukan jenis pesan singkat yang ditampilkan kepada pengguna.
+///
+/// Nilai ini mengatur gaya snackbar sesuai konteks pesan.
 enum SnackBarType { success, error, info }
 
+/// Menyediakan helper untuk menampilkan snackbar bergaya aplikasi.
+///
+/// Class ini menjaga tampilan pesan tetap konsisten di berbagai halaman.
 class NotificationUtils {
   static void show(
     BuildContext context, {

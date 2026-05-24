@@ -8,6 +8,9 @@ final searchControllerProvider = StateNotifierProvider.autoDispose<SearchControl
   return SearchController(ref.watch(kostRepositoryProvider));
 });
 
+/// Mengelola pencarian kos dan pagination hasil pencarian.
+///
+/// Class ini memperbarui daftar hasil berdasarkan kata kunci pengguna.
 class SearchController extends StateNotifier<KostListState> {
   final KostRepository _repository;
   String _currentQuery = '';
@@ -15,15 +18,24 @@ class SearchController extends StateNotifier<KostListState> {
   SearchController(this._repository)
       : super(KostListState(kosts: [], isLoading: false, hasMore: true, page: 1));
 
+  /// Memulai pencarian kos berdasarkan kata kunci.
+  ///
+  /// Method ini mengatur ulang hasil sebelum data baru dimuat.
   void search(String query) {
     _currentQuery = query;
     _fetchResults(isRefresh: true);
   }
 
+  /// Memuat halaman berikutnya jika masih tersedia.
+  ///
+  /// Method ini dipakai saat pengguna menggulir daftar hasil.
   void loadMore() {
     _fetchResults(isRefresh: false);
   }
 
+  /// Mengambil hasil pencarian dan memperbarui state daftar.
+  ///
+  /// Method ini menjaga proses pencarian tetap terpusat.
   Future<void> _fetchResults({bool isRefresh = false}) async {
     if (_currentQuery.isEmpty) {
       state = state.copyWith(page: 1, hasMore: false, isLoading: false, error: null, kosts: []);

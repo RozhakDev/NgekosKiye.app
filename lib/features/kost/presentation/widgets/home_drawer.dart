@@ -6,9 +6,15 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../profile/presentation/controllers/profile_controller.dart';
 
+/// Menampilkan menu samping pada halaman utama.
+///
+/// Widget ini menyediakan akses ke profil, riwayat, dan informasi aplikasi.
 class HomeDrawer extends ConsumerWidget {
   const HomeDrawer({super.key});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileState = ref.watch(profileControllerProvider);
@@ -128,6 +134,9 @@ class HomeDrawer extends ConsumerWidget {
     );
   }
 
+  /// Menampilkan modal informasi berdasarkan menu yang dipilih.
+  ///
+  /// Method ini digunakan untuk konten bantuan dan informasi aplikasi.
   void _showInfoModal(BuildContext context, {required String title, required IconData icon, required String content}) {
     showModalBottomSheet(
       context: context,

@@ -1,6 +1,12 @@
 import 'package:intl/intl.dart';
 
+/// Menyediakan format harga Rupiah yang konsisten di seluruh aplikasi.
+///
+/// Class ini membantu angka harga siap ditampilkan ke pengguna.
 class CurrencyFormatter {
+  /// Mengubah nilai harga menjadi format Rupiah penuh.
+  ///
+  /// Method ini digunakan saat harga perlu ditampilkan secara lengkap.
   static String toIDR(dynamic amount) {
     if (amount == null) return 'Rp 0';
     try {
@@ -12,6 +18,9 @@ class CurrencyFormatter {
     }
   }
 
+  /// Mengubah nilai harga menjadi format Rupiah singkat.
+  ///
+  /// Method ini cocok untuk tampilan ringkas seperti kartu kos.
   static String toShortIDR(dynamic amount) {
     if (amount == null) return 'Rp 0';
     try {

@@ -3,9 +3,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
+/// Menampilkan kolom pencarian pada area sliver halaman utama.
+///
+/// Widget ini mengarahkan pengguna menuju halaman pencarian.
 class HomeSearchBarSliver extends StatelessWidget {
   const HomeSearchBarSliver({super.key});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(

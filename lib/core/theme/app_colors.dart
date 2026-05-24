@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// Menyimpan palet warna utama yang digunakan oleh aplikasi.
+///
+/// Class ini membantu menjaga warna UI tetap konsisten.
 class AppColors {
   static const Color primary = Color(0xFFF95D18);
   static const Color secondary = Color(0xFF00629F);

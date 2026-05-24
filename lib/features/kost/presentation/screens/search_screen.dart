@@ -8,20 +8,32 @@ import '../../domain/kost_model.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 
+/// Menampilkan halaman pencarian kos.
+///
+/// Widget ini digunakan untuk menemukan kos berdasarkan kata kunci.
 class SearchScreen extends ConsumerStatefulWidget {
   final String? initialQuery;
   const SearchScreen({super.key, this.initialQuery});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
+/// Mengelola input pencarian, scroll, dan daftar hasil.
+///
+/// State ini memuat hasil baru saat kata kunci atau halaman berubah.
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   late final TextEditingController _searchController;
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
   final FocusNode _focusNode = FocusNode();
 
+  /// Menyiapkan state awal saat widget pertama kali dibuat.
+  ///
+  /// Method ini dipakai untuk memulai listener, timer, atau pemuatan data awal.
   @override
   void initState() {
     super.initState();
@@ -36,6 +48,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     });
   }
 
+  /// Membersihkan controller dan resource saat halaman tidak digunakan.
+  ///
+  /// Method ini mencegah resource tetap aktif setelah widget ditutup.
   @override
   void dispose() {
     _searchController.dispose();
@@ -46,12 +61,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     super.dispose();
   }
 
+  /// Memantau posisi scroll untuk memuat data tambahan.
+  ///
+  /// Method ini membantu pagination berjalan otomatis.
   void _onScroll() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
       ref.read(search_ctrl.searchControllerProvider.notifier).loadMore();
     }
   }
 
+  /// Menangani perubahan kata kunci pencarian dari pengguna.
+  ///
+  /// Method ini memicu pencarian baru sesuai input terakhir.
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
@@ -59,6 +80,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     });
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(search_ctrl.searchControllerProvider);
@@ -121,6 +145,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
+  /// Membangun isi halaman sesuai state pemuatan dan data.
+  ///
+  /// Method ini memilih tampilan kosong, loading, error, atau daftar data.
   Widget _buildBody(state) {
     if (_searchController.text.isEmpty) {
       return _buildEmptyState('Ketikkan sesuatu untuk mulai mencari.', Icons.search);
@@ -154,6 +181,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
+  /// Menampilkan tampilan kosong dengan pesan yang sesuai.
+  ///
+  /// Method ini digunakan saat pencarian atau daftar tidak memiliki hasil.
   Widget _buildEmptyState(String message, IconData icon) {
     return Center(
       child: Padding(
@@ -175,11 +205,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 }
 
+/// Menampilkan ringkasan kos pada hasil pencarian.
+///
+/// Widget ini memudahkan pengguna membandingkan hasil secara cepat.
 class _SearchKostItemCard extends StatelessWidget {
   final KostModel kost;
 
   const _SearchKostItemCard({required this.kost});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

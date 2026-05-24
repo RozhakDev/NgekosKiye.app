@@ -17,18 +17,30 @@ final selectedRoomIdProvider = StateProvider.autoDispose<int?>((ref) => null);
 final bookingStartDateProvider = StateProvider.autoDispose<DateTime?>((ref) => null);
 final bookingDurationProvider = StateProvider.autoDispose<int>((ref) => 1);
 
+/// Menampilkan detail kos beserta galeri, fasilitas, dan pilihan kamar.
+///
+/// Widget ini membantu pengguna meninjau kos sebelum memesan.
 class KostDetailScreen extends ConsumerStatefulWidget {
   final int id;
   const KostDetailScreen({super.key, required this.id});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<KostDetailScreen> createState() => _KostDetailScreenState();
 }
 
+/// Mengelola interaksi scroll pada halaman detail kos.
+///
+/// State ini mengarahkan pengguna ke bagian kamar saat diperlukan.
 class _KostDetailScreenState extends ConsumerState<KostDetailScreen> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _roomsSectionKey = GlobalKey();
 
+  /// Menggulir halaman menuju bagian pilihan kamar.
+  ///
+  /// Method ini memudahkan pengguna langsung melihat kamar yang tersedia.
   void _scrollToRooms() {
     final context = _roomsSectionKey.currentContext;
     if (context != null) {
@@ -40,6 +52,9 @@ class _KostDetailScreenState extends ConsumerState<KostDetailScreen> {
     }
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final detailAsyncValue = ref.watch(kostDetailProvider(widget.id));
@@ -75,17 +90,29 @@ class _KostDetailScreenState extends ConsumerState<KostDetailScreen> {
   }
 }
 
+/// Menampilkan galeri gambar kos pada bagian atas halaman detail.
+///
+/// Widget ini memberi gambaran visual utama dari kos.
 class _ImageGallerySliver extends ConsumerStatefulWidget {
   final KostModel kost;
   const _ImageGallerySliver({required this.kost});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<_ImageGallerySliver> createState() => _ImageGallerySliverState();
 }
 
+/// Mengelola state galeri gambar pada halaman detail kos.
+///
+/// State ini menjaga tampilan gambar tetap responsif terhadap interaksi pengguna.
 class _ImageGallerySliverState extends ConsumerState<_ImageGallerySliver> {
   int _currentIndex = 0;
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final images = widget.kost.images;
@@ -171,6 +198,9 @@ class _ImageGallerySliverState extends ConsumerState<_ImageGallerySliver> {
     );
   }
 
+  /// Membuat tombol ikon berbentuk lingkaran untuk aksi cepat.
+  ///
+  /// Method ini digunakan pada galeri dan aksi detail kos.
   Widget _buildCircularBtn({required IconData icon, Color iconColor = AppColors.textPrimary, required VoidCallback onTap}) {
     return Material(
       color: Colors.white,
@@ -188,11 +218,17 @@ class _ImageGallerySliverState extends ConsumerState<_ImageGallerySliver> {
   }
 }
 
+/// Menampilkan nama, harga, dan lokasi kos dalam bentuk sliver.
+///
+/// Widget ini merangkum informasi utama kos.
 class _TitleLocationSliver extends StatelessWidget {
   final KostModel kost;
 
   const _TitleLocationSliver({required this.kost});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
@@ -256,11 +292,17 @@ class _TitleLocationSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan daftar fasilitas kos dalam bentuk sliver.
+///
+/// Widget ini membantu pengguna memahami fasilitas yang tersedia.
 class _FacilitiesSliver extends StatelessWidget {
   final String facilitiesStr;
 
   const _FacilitiesSliver({required this.facilitiesStr});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final allFacilities = facilitiesStr.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
@@ -345,12 +387,18 @@ class _FacilitiesSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan pilihan kamar yang dapat dipesan.
+///
+/// Widget ini menyediakan aksi booking untuk kamar yang tersedia.
 class _RoomsSelectionSliver extends ConsumerWidget {
   final KostModel kost;
   final GlobalKey sectionKey;
 
   const _RoomsSelectionSliver({required this.kost, required this.sectionKey});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final rooms = kost.rooms ?? [];
@@ -476,18 +524,30 @@ class _RoomsSelectionSliver extends ConsumerWidget {
   }
 }
 
+/// Menampilkan carousel gambar untuk satu kamar.
+///
+/// Widget ini membantu pengguna melihat kondisi kamar lebih jelas.
 class _RoomImageCarousel extends StatefulWidget {
   final List<String> images;
 
   const _RoomImageCarousel({required this.images});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   State<_RoomImageCarousel> createState() => _RoomImageCarouselState();
 }
 
+/// Mengelola state tampilan gambar kamar.
+///
+/// State ini menjaga perpindahan gambar tetap terkontrol.
 class _RoomImageCarouselState extends State<_RoomImageCarousel> {
   int _currentIndex = 0;
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -541,11 +601,17 @@ class _RoomImageCarouselState extends State<_RoomImageCarousel> {
   }
 }
 
+/// Menampilkan deskripsi kos dalam bentuk sliver.
+///
+/// Widget ini memberi konteks tambahan sebelum pengguna memesan.
 class _DescriptionSliver extends StatelessWidget {
   final String description;
 
   const _DescriptionSliver({required this.description});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
@@ -570,11 +636,17 @@ class _DescriptionSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan pratinjau lokasi kos pada peta.
+///
+/// Widget ini membantu pengguna memahami posisi kos.
 class _LocationMapSliver extends StatelessWidget {
   final KostModel kost;
 
   const _LocationMapSliver({required this.kost});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
@@ -615,12 +687,18 @@ class _LocationMapSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan aksi utama yang tetap terlihat di bagian bawah detail kos.
+///
+/// Widget ini memudahkan pengguna lanjut ke bagian pemesanan.
 class _StickyBottomBar extends ConsumerWidget {
   final KostModel kost;
   final VoidCallback onScrollToRooms;
 
   const _StickyBottomBar({required this.kost, required this.onScrollToRooms});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedId = ref.watch(selectedRoomIdProvider);
@@ -729,9 +807,15 @@ class _StickyBottomBar extends ConsumerWidget {
   }
 }
 
+/// Menampilkan pemisah tebal antarbagian detail kos.
+///
+/// Widget ini membuat struktur halaman lebih mudah dibaca.
 class _ThickDividerSliver extends StatelessWidget {
   const _ThickDividerSliver();
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(

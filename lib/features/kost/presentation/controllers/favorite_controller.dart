@@ -6,6 +6,9 @@ final favoriteProvider = StateNotifierProvider<FavoriteNotifier, Set<int>>((ref)
   return FavoriteNotifier();
 });
 
+/// Mengelola daftar kos favorit yang tersimpan di perangkat.
+///
+/// Class ini membuat status favorit dapat digunakan ulang oleh tampilan.
 class FavoriteNotifier extends StateNotifier<Set<int>> {
   FavoriteNotifier() : super({}) {
     _loadFavorites();
@@ -13,6 +16,9 @@ class FavoriteNotifier extends StateNotifier<Set<int>> {
 
   static const String _prefsKey = 'favorite_kosts';
 
+  /// Memuat daftar kos favorit dari penyimpanan lokal.
+  ///
+  /// Method ini dijalankan saat notifier pertama kali dibuat.
   Future<void> _loadFavorites() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -25,6 +31,9 @@ class FavoriteNotifier extends StateNotifier<Set<int>> {
     }
   }
 
+  /// Menambah atau menghapus kos dari daftar favorit.
+  ///
+  /// Method ini memperbarui data lokal dan state tampilan.
   Future<void> toggleFavorite(int kostId) async {
     final newFavorites = Set<int>.from(state);
 
@@ -44,6 +53,9 @@ class FavoriteNotifier extends StateNotifier<Set<int>> {
     }
   }
 
+  /// Memeriksa apakah kos termasuk dalam daftar favorit.
+  ///
+  /// Nilai benar menunjukkan kos sudah disimpan pengguna.
   bool isFavorite(int kostId) {
     return state.contains(kostId);
   }

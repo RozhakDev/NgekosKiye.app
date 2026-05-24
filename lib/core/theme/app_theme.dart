@@ -4,7 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
+/// Menyediakan konfigurasi tema visual untuk aplikasi.
+///
+/// Class ini mengatur gaya komponen Flutter secara terpusat.
 class AppTheme {
+  /// Menghasilkan tema terang yang digunakan oleh aplikasi.
+  ///
+  /// Tema ini mengatur warna, teks, input, dan tombol secara terpusat.
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,

@@ -44,11 +44,17 @@ final bookingControllerProvider = StateNotifierProvider<BookingController, Async
   return BookingController(ref.watch(bookingRepositoryProvider));
 });
 
+/// Mengelola state pembuatan booking dan unggahan bukti pembayaran.
+///
+/// Class ini menjaga alur pemesanan tetap terpisah dari tampilan.
 class BookingController extends StateNotifier<AsyncValue<BookingModel?>> {
   final BookingRepository _repository;
 
   BookingController(this._repository) : super(const AsyncValue.data(null));
 
+  /// Membuat pemesanan kamar dengan tanggal mulai dan durasi sewa.
+  ///
+  /// Method ini mengembalikan data booking saat proses berhasil.
   Future<BookingModel?> createBooking(int roomId, String startDate, int duration) async {
     state = const AsyncValue.loading();
     try {
@@ -66,6 +72,9 @@ class BookingController extends StateNotifier<AsyncValue<BookingModel?>> {
     }
   }
 
+  /// Mengirim bukti pembayaran untuk booking yang dipilih.
+  ///
+  /// Method ini mengembalikan status keberhasilan unggahan.
   Future<bool> uploadPayment(int bookingId, File image) async {
     state = const AsyncValue.loading();
     try {

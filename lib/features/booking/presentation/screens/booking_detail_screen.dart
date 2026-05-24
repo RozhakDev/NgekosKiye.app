@@ -7,10 +7,16 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../controllers/booking_controller.dart';
 
+/// Menampilkan detail lengkap dari satu pemesanan.
+///
+/// Widget ini memperlihatkan status, kamar, harga, dan informasi pembayaran.
 class BookingDetailScreen extends ConsumerWidget {
   final int id;
   const BookingDetailScreen({super.key, required this.id});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(bookingDetailProvider(id));
@@ -181,6 +187,9 @@ class BookingDetailScreen extends ConsumerWidget {
     );
   }
 
+  /// Menampilkan satu baris informasi dengan label dan nilai.
+  ///
+  /// Method ini menjaga format detail tetap konsisten.
   Widget _buildInfoRow(String label, String value, {bool isBold = false, Color? valueColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

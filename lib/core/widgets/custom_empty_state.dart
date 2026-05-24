@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Menampilkan kondisi kosong dengan ikon, judul, dan pesan pendukung.
+///
+/// Widget ini digunakan saat tidak ada data yang dapat ditampilkan.
 class CustomEmptyState extends StatelessWidget {
   final String message;
   final IconData icon;
@@ -16,6 +19,9 @@ class CustomEmptyState extends StatelessWidget {
     this.retryText = 'Coba Lagi',
   });
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return Center(

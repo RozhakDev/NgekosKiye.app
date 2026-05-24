@@ -128,10 +128,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
+/// Menampilkan halaman sementara untuk rute yang belum final.
+///
+/// Widget ini membantu menjaga navigasi tetap berjalan saat fitur belum tersedia.
 class PlaceholderScreen extends StatelessWidget {
   final String title;
   const PlaceholderScreen({super.key, required this.title});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,3 +1,6 @@
+/// Mewakili informasi profil pengguna.
+///
+/// Model ini menyimpan identitas dasar yang ditampilkan di halaman profil.
 class UserModel {
   final int id;
   final String username;
@@ -15,6 +18,9 @@ class UserModel {
     required this.phoneNumber,
   });
 
+  /// Membentuk objek model dari data JSON API.
+  ///
+  /// Factory ini digunakan saat respons server perlu dipakai oleh aplikasi.
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] ?? 0,

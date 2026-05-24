@@ -5,6 +5,9 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
+/// Menampilkan lokasi kos dalam peta.
+///
+/// Widget ini membantu pengguna melihat posisi kos secara geografis.
 class KostMapScreen extends StatelessWidget {
   final double lat;
   final double lng;
@@ -17,6 +20,9 @@ class KostMapScreen extends StatelessWidget {
     required this.title,
   });
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final targetPosition = LatLng(lat, lng);

@@ -1,3 +1,6 @@
+/// Mewakili metode pembayaran yang tersedia untuk booking.
+///
+/// Model ini digunakan saat pengguna memilih cara pembayaran.
 class PaymentMethodModel {
   final int id;
   final String name;
@@ -5,6 +8,9 @@ class PaymentMethodModel {
 
   PaymentMethodModel({required this.id, required this.name, this.image});
 
+  /// Membentuk objek model dari data JSON API.
+  ///
+  /// Factory ini digunakan saat respons server perlu dipakai oleh aplikasi.
   factory PaymentMethodModel.fromJson(Map<String, dynamic> json) {
     return PaymentMethodModel(
       id: json['id'] ?? 0,
@@ -14,6 +20,9 @@ class PaymentMethodModel {
   }
 }
 
+/// Mewakili bukti pembayaran yang sudah diunggah pengguna.
+///
+/// Model ini menyimpan informasi gambar dan waktu unggahan.
 class PaymentProofModel {
   final int id;
   final String image;
@@ -21,6 +30,9 @@ class PaymentProofModel {
 
   PaymentProofModel({required this.id, required this.image, required this.uploadedAt});
 
+  /// Membentuk objek model dari data JSON API.
+  ///
+  /// Factory ini digunakan saat respons server perlu dipakai oleh aplikasi.
   factory PaymentProofModel.fromJson(Map<String, dynamic> json) {
     return PaymentProofModel(
       id: json['id'] ?? 0,
@@ -30,6 +42,9 @@ class PaymentProofModel {
   }
 }
 
+/// Mewakili informasi pemesanan kamar kos.
+///
+/// Model ini digunakan untuk riwayat, detail, dan status booking.
 class BookingModel {
   final int id;
   final int room;
@@ -55,6 +70,9 @@ class BookingModel {
     this.paymentProof,
   });
 
+  /// Membentuk objek model dari data JSON API.
+  ///
+  /// Factory ini digunakan saat respons server perlu dipakai oleh aplikasi.
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
       id: json['id'] ?? 0,

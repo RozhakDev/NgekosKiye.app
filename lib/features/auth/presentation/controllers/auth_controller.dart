@@ -14,6 +14,9 @@ final authControllerProvider = StateNotifierProvider<AuthController, AsyncValue<
   );
 });
 
+/// Mengelola state dan proses autentikasi pengguna.
+///
+/// Class ini menghubungkan repository dengan tampilan autentikasi.
 class AuthController extends StateNotifier<AsyncValue<void>> {
   final AuthRepository _repository;
   final SecureStorageService _storage;
@@ -21,6 +24,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
 
   AuthController(this._repository, this._storage, this._ref) : super(const AsyncValue.data(null));
 
+  /// Memproses autentikasi pengguna dengan kredensial yang diberikan.
+  ///
+  /// Method ini digunakan saat pengguna masuk ke aplikasi.
   Future<void> login(String username, String password) async {
     state = const AsyncValue.loading();
     try {
@@ -40,6 +46,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  /// Mengirim data pendaftaran akun baru ke server.
+  ///
+  /// Method ini digunakan saat pengguna membuat akun.
   Future<void> register(Map<String, dynamic> data) async {
     state = const AsyncValue.loading();
     try {
@@ -57,6 +66,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  /// Memverifikasi kode OTP yang dikirim ke email pengguna.
+  ///
+  /// Method ini menyelesaikan proses verifikasi akun.
   Future<void> verifyOtp(String email, String otp) async {
     state = const AsyncValue.loading();
     try {
@@ -68,6 +80,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  /// Meminta pengiriman ulang kode OTP ke email pengguna.
+  ///
+  /// Method ini digunakan saat pengguna belum menerima atau melewatkan kode.
   Future<void> resendOtp(String email) async {
     state = const AsyncValue.loading();
     try {
@@ -81,6 +96,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  /// Memulai proses pemulihan kata sandi melalui email.
+  ///
+  /// Method ini mengirim permintaan reset ke server.
   Future<bool> forgotPassword(String email) async {
     state = const AsyncValue.loading();
     try {
@@ -97,6 +115,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  /// Mengirim OTP dan kata sandi baru untuk menyelesaikan reset akun.
+  ///
+  /// Method ini digunakan setelah pengguna menerima kode pemulihan.
   Future<bool> resetPassword(String email, String otp, String password) async {
     state = const AsyncValue.loading();
     try {

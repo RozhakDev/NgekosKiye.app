@@ -11,23 +11,38 @@ import '../../../../core/widgets/custom_empty_state.dart';
 import '../widgets/home_search_bar.dart';
 import '../widgets/home_drawer.dart';
 
+/// Menampilkan halaman utama berisi daftar dan rekomendasi kos.
+///
+/// Widget ini menjadi pusat navigasi utama pengguna.
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
+/// Mengelola scroll, refresh, dan navigasi pada halaman utama.
+///
+/// State ini memicu pemuatan data tambahan saat pengguna menggulir.
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   final ScrollController _scrollController = ScrollController();
   int _selectedIndex = 0;
 
+  /// Menyiapkan state awal saat widget pertama kali dibuat.
+  ///
+  /// Method ini dipakai untuk memulai listener, timer, atau pemuatan data awal.
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
   }
 
+  /// Membersihkan controller dan resource saat halaman tidak digunakan.
+  ///
+  /// Method ini mencegah resource tetap aktif setelah widget ditutup.
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
@@ -35,12 +50,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     super.dispose();
   }
 
+  /// Memantau posisi scroll untuk memuat data tambahan.
+  ///
+  /// Method ini membantu pagination berjalan otomatis.
   void _onScroll() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
       ref.read(kostListControllerProvider.notifier).fetchKosts();
     }
   }
 
+  /// Menangani pilihan menu navigasi bawah.
+  ///
+  /// Method ini mengarahkan pengguna ke halaman sesuai tab yang dipilih.
   void _onBottomNavTapped(int index) {
     if (index == 1) {
       context.push('/search');
@@ -55,10 +76,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
   }
 
+  /// Memuat ulang daftar kos dari halaman pertama.
+  ///
+  /// Method ini digunakan saat pengguna melakukan pull to refresh.
   Future<void> _onRefresh() async {
     await ref.read(kostListControllerProvider.notifier).fetchKosts(isRefresh: true);
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(kostListControllerProvider);
@@ -79,6 +106,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
+  /// Membangun isi halaman sesuai state pemuatan dan data.
+  ///
+  /// Method ini memilih tampilan kosong, loading, error, atau daftar data.
   Widget _buildBody(KostListState state) {
     if (state.kosts.isEmpty && state.isLoading) {
       return const Center(child: CircularProgressIndicator(color: AppColors.primary));
@@ -113,9 +143,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 }
 
+/// Menampilkan app bar khusus pada halaman utama.
+///
+/// Widget ini menyediakan akses menu dan notifikasi.
 class _DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
   const _DashboardAppBar();
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -149,16 +185,25 @@ class _DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
+  /// Menentukan tinggi app bar agar sesuai dengan kontrak Flutter.
+  ///
+  /// Nilai ini dipakai oleh Scaffold saat menempatkan app bar.
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
+/// Menampilkan navigasi bawah untuk akses cepat halaman utama.
+///
+/// Widget ini membantu pengguna berpindah ke bagian penting aplikasi.
 class _DashboardBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
   const _DashboardBottomNavBar({required this.currentIndex, required this.onTap});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
@@ -182,9 +227,15 @@ class _DashboardBottomNavBar extends StatelessWidget {
   }
 }
 
+/// Menampilkan daftar promo dalam bentuk sliver horizontal.
+///
+/// Widget ini memberi sorotan visual pada konten promosi.
 class _PromoSliderSliver extends StatelessWidget {
   const _PromoSliderSliver();
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
@@ -263,9 +314,15 @@ class _PromoSliderSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan pilihan lokasi populer dalam bentuk sliver.
+///
+/// Widget ini membantu pengguna menemukan kos berdasarkan area.
 class _PopularLocationsSliver extends StatelessWidget {
   const _PopularLocationsSliver();
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final locations = ['Banyumas', 'Cilacap', 'Purbalingga', 'Kebumen', 'Brebes', 'Tegal', 'Banjarnegara', 'Wonosobo'];
@@ -313,12 +370,18 @@ class _PopularLocationsSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan judul bagian pada daftar sliver.
+///
+/// Widget ini memisahkan konten halaman agar mudah dipindai.
 class _SectionTitleSliver extends StatelessWidget {
   final String title;
   final String actionText;
 
   const _SectionTitleSliver({required this.title, required this.actionText});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
@@ -353,9 +416,15 @@ class _SectionTitleSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan garis pemisah antarbagian sliver.
+///
+/// Widget ini menjaga struktur visual halaman tetap rapi.
 class _SeparatorLineSliver extends StatelessWidget {
   const _SeparatorLineSliver();
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return const SliverToBoxAdapter(
@@ -364,11 +433,17 @@ class _SeparatorLineSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan daftar kos dalam struktur sliver.
+///
+/// Widget ini menyusun kartu kos pada halaman utama.
 class _KostListSliver extends StatelessWidget {
   final List<KostModel> kosts;
 
   const _KostListSliver({required this.kosts});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverList(
@@ -386,12 +461,18 @@ class _KostListSliver extends StatelessWidget {
   }
 }
 
+/// Menampilkan ringkasan satu kos pada daftar utama.
+///
+/// Widget ini memuat gambar, nama, lokasi, dan harga kos.
 class _KostListItemCard extends StatelessWidget {
   final KostModel kost;
   final String badgeText;
 
   const _KostListItemCard({required this.kost, required this.badgeText});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -493,6 +574,9 @@ class _KostListItemCard extends StatelessWidget {
   }
 }
 
+/// Menampilkan indikator saat data tambahan sedang dimuat.
+///
+/// Widget ini memberi umpan balik pada proses pagination.
 class _LoadMoreSliver extends StatelessWidget {
   final bool isLoading;
   final bool hasMore;
@@ -500,6 +584,9 @@ class _LoadMoreSliver extends StatelessWidget {
 
   const _LoadMoreSliver({required this.isLoading, required this.hasMore, required this.onTapped});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(

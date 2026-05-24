@@ -2,12 +2,18 @@ import 'package:dio/dio.dart';
 
 import '../local_storage/secure_storage_service.dart';
 
+/// Menambahkan token autentikasi dan menangani kegagalan otorisasi pada request API.
+///
+/// Class ini bekerja bersama Dio sebelum dan sesudah request dikirim.
 class AuthInterceptor extends Interceptor {
   final Dio dio;
   final SecureStorageService secureStorage;
 
   AuthInterceptor(this.dio, this.secureStorage);
 
+  /// Menambahkan token akses ke header sebelum request dikirim.
+  ///
+  /// Method ini dipanggil otomatis oleh Dio pada setiap request.
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await secureStorage.getAccessToken();
@@ -19,6 +25,9 @@ class AuthInterceptor extends Interceptor {
     return super.onRequest(options, handler);
   }
 
+  /// Menangani respons error dan membersihkan sesi saat token tidak valid.
+  ///
+  /// Method ini membantu menjaga alur autentikasi tetap aman.
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final isAuthPath = err.requestOptions.path.contains('/auth/login') || 

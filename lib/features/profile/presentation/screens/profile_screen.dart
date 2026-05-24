@@ -8,19 +8,31 @@ import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/user_model.dart';
 import '../../../../core/widgets/custom_empty_state.dart';
 
+/// Menampilkan informasi profil dan form pengeditan pengguna.
+///
+/// Widget ini memungkinkan pengguna melihat dan memperbarui data akun.
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
+/// Mengelola state edit profil dan aksi keluar akun.
+///
+/// State ini menyimpan nilai input saat pengguna mengubah profil.
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _firstNameCtrl = TextEditingController();
   final _lastNameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   bool _isEditing = false;
 
+  /// Menyimpan perubahan profil yang diisi pengguna.
+  ///
+  /// Method ini mengirim data edit ke controller profil.
   void _saveProfile() async {
     final success = await ref.read(profileControllerProvider.notifier).updateProfile({
       'first_name': _firstNameCtrl.text.trim(),
@@ -37,11 +49,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  /// Menjalankan proses keluar akun dan mengarahkan pengguna ke login.
+  ///
+  /// Method ini dipakai saat pengguna memilih keluar dari akun.
   void _logout() {
     ref.read(profileControllerProvider.notifier).logout();
     context.go('/');
   }
 
+  /// Membersihkan controller dan resource saat halaman tidak digunakan.
+  ///
+  /// Method ini mencegah resource tetap aktif setelah widget ditutup.
   @override
   void dispose() {
     _firstNameCtrl.dispose();
@@ -50,6 +68,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.dispose();
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     final profileState = ref.watch(profileControllerProvider);
@@ -129,6 +150,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  /// Menampilkan ringkasan identitas pengguna di bagian atas profil.
+  ///
+  /// Method ini menyusun avatar dan nama pengguna.
   Widget _buildProfileHeader(UserModel user) {
     final initial = user.firstName.isNotEmpty 
         ? user.firstName[0].toUpperCase() 
@@ -175,6 +199,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  /// Menampilkan detail informasi profil pengguna.
+  ///
+  /// Method ini memperlihatkan username, email, dan nomor telepon.
   Widget _buildProfileInfo(UserModel user) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,6 +243,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  /// Menampilkan satu baris informasi dengan label dan nilai.
+  ///
+  /// Method ini menjaga format detail tetap konsisten.
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -236,6 +266,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  /// Menampilkan form untuk mengubah data profil pengguna.
+  ///
+  /// Method ini digunakan saat pengguna masuk ke mode edit.
   Widget _buildEditForm(UserModel user, bool isLoading) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

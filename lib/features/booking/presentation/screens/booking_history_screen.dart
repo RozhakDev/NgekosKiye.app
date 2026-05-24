@@ -8,9 +8,15 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/custom_empty_state.dart';
 
+/// Menampilkan riwayat pemesanan pengguna.
+///
+/// Widget ini membantu pengguna melihat daftar booking yang pernah dibuat.
 class BookingHistoryScreen extends ConsumerWidget {
   const BookingHistoryScreen({super.key});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final historyAsync = ref.watch(bookingHistoryProvider);

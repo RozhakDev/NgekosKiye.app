@@ -7,13 +7,22 @@ import '../controllers/auth_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 
+/// Menampilkan form pendaftaran akun baru.
+///
+/// Widget ini mengumpulkan data dasar pengguna sebelum registrasi.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
+/// Mengelola state input dan aksi pendaftaran akun.
+///
+/// State ini menyiapkan data form sebelum dikirim ke controller.
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailCtrl = TextEditingController();
   final _userCtrl = TextEditingController();
@@ -22,6 +31,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _obscurePassword = true;
   bool _agreedToTerms = false;
 
+  /// Membersihkan controller dan resource saat halaman tidak digunakan.
+  ///
+  /// Method ini mencegah resource tetap aktif setelah widget ditutup.
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -30,6 +42,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  /// Memvalidasi input lalu menjalankan proses pendaftaran akun.
+  ///
+  /// Method ini menyiapkan data pengguna sebelum dikirim.
   void _register() async {
     if (!_agreedToTerms) {
       NotificationUtils.show(
@@ -61,6 +76,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {

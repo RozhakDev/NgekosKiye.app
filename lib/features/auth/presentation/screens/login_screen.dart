@@ -7,18 +7,30 @@ import '../controllers/auth_controller.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 
+/// Menampilkan form masuk untuk pengguna.
+///
+/// Widget ini digunakan sebagai pintu awal akses akun.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
+/// Mengelola state input dan aksi masuk pada halaman login.
+///
+/// State ini menangani validasi sederhana sebelum proses login dijalankan.
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
+  /// Membersihkan controller dan resource saat halaman tidak digunakan.
+  ///
+  /// Method ini mencegah resource tetap aktif setelah widget ditutup.
   @override
   void dispose() {
     _emailController.dispose();
@@ -26,6 +38,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  /// Memvalidasi input lalu menjalankan proses masuk akun.
+  ///
+  /// Method ini menghubungkan form login dengan controller autentikasi.
   void _login() {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -34,6 +49,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.read(authControllerProvider.notifier).login(email, password);
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {

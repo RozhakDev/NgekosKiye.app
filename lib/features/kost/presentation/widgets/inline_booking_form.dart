@@ -5,9 +5,15 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../screens/kost_detail_screen.dart';
 
+/// Menampilkan form pemesanan cepat untuk kamar yang dipilih.
+///
+/// Widget ini membantu pengguna memilih tanggal mulai dan durasi sewa.
 class InlineBookingForm extends ConsumerWidget {
   const InlineBookingForm({super.key});
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final startDate = ref.watch(bookingStartDateProvider);

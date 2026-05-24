@@ -1,3 +1,6 @@
+/// Mewakili informasi utama sebuah kos.
+///
+/// Model ini menyimpan data dasar seperti nama, lokasi, harga, dan gambar.
 class KostModel {
   final int id;
   final String name;
@@ -23,6 +26,9 @@ class KostModel {
     this.rooms,
   });
 
+  /// Membentuk objek model dari data JSON API.
+  ///
+  /// Factory ini digunakan saat respons server perlu dipakai oleh aplikasi.
   factory KostModel.fromJson(Map<String, dynamic> json) {
     var imgList = json['images'] as List? ?? [];
     List<String> imageUrls = imgList.map((i) => i['image'].toString()).toList();
@@ -45,6 +51,9 @@ class KostModel {
   }
 }
 
+/// Mewakili informasi kamar yang tersedia pada kos.
+///
+/// Model ini digunakan untuk menampilkan pilihan kamar dan harga sewa.
 class RoomModel {
   final int id;
   final String roomNumber;
@@ -60,6 +69,9 @@ class RoomModel {
     required this.images,
   });
 
+  /// Membentuk objek model dari data JSON API.
+  ///
+  /// Factory ini digunakan saat respons server perlu dipakai oleh aplikasi.
   factory RoomModel.fromJson(Map<String, dynamic> json) {
     var imgList = json['images'] as List? ?? [];
     List<String> imageUrls = imgList.map((i) => i['image'].toString()).toList();

@@ -9,14 +9,24 @@ import '../../../../core/theme/app_colors.dart';
 import '../controllers/auth_controller.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 
+/// Menampilkan halaman verifikasi kode OTP.
+///
+/// Widget ini digunakan setelah pengguna melakukan registrasi
+/// atau permintaan verifikasi.
 class OtpScreen extends ConsumerStatefulWidget {
   final String email;
   const OtpScreen({super.key, required this.email});
 
+  /// Membuat state yang mengelola interaksi halaman.
+  ///
+  /// Digunakan oleh Flutter untuk menghubungkan widget dengan state-nya.
   @override
   ConsumerState<OtpScreen> createState() => _OtpScreenState();
 }
 
+/// Mengelola timer, input, dan aksi verifikasi OTP.
+///
+/// State ini menjaga proses verifikasi tetap terarah untuk pengguna.
 class _OtpScreenState extends ConsumerState<OtpScreen> {
   final _otpCtrl = TextEditingController();
   final _focusNode = FocusNode();
@@ -25,12 +35,18 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   int _start = 60;
   bool _canResend = false;
 
+  /// Menyiapkan state awal saat widget pertama kali dibuat.
+  ///
+  /// Method ini dipakai untuk memulai listener, timer, atau pemuatan data awal.
   @override
   void initState() {
     super.initState();
     _startTimer();
   }
 
+  /// Memulai hitung mundur untuk pengiriman ulang OTP.
+  ///
+  /// Method ini mengatur kapan tombol kirim ulang dapat digunakan.
   void _startTimer() {
     setState(() {
       _start = 45;
@@ -53,6 +69,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     );
   }
 
+  /// Membersihkan controller dan resource saat halaman tidak digunakan.
+  ///
+  /// Method ini mencegah resource tetap aktif setelah widget ditutup.
   @override
   void dispose() {
     _timer?.cancel();
@@ -61,12 +80,18 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     super.dispose();
   }
 
+  /// Menghasilkan teks hitung mundur dalam format menit dan detik.
+  ///
+  /// Nilai ini ditampilkan agar pengguna mengetahui sisa waktu.
   String get timerText {
     final minutes = (_start ~/ 60).toString().padLeft(2, '0');
     final seconds = (_start % 60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
+  /// Memvalidasi kode OTP lalu mengirimnya untuk diverifikasi.
+  ///
+  /// Method ini dijalankan saat pengguna mengonfirmasi kode.
   void _verify() async {
     if (_otpCtrl.text.length < 6) return;
     final notifier = ref.read(authControllerProvider.notifier);
@@ -82,6 +107,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
   }
 
+  /// Meminta kode OTP baru dan mengatur ulang timer.
+  ///
+  /// Method ini digunakan saat pengguna meminta pengiriman ulang.
   void _resend() async {
     if (!_canResend) return;
     
@@ -97,6 +125,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
   }
 
+  /// Membangun tampilan widget berdasarkan state yang tersedia.
+  ///
+  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(authControllerProvider, (_, state) {

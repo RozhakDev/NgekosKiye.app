@@ -4,17 +4,13 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-/// Default [FirebaseOptions] for use with your Firebase apps.
+/// Menyediakan konfigurasi Firebase untuk setiap platform yang didukung.
 ///
-/// Example:
-/// ```dart
-/// import 'firebase_options.dart';
-/// // ...
-/// await Firebase.initializeApp(
-///   options: DefaultFirebaseOptions.currentPlatform,
-/// );
-/// ```
+/// Class ini dipakai saat aplikasi melakukan inisialisasi Firebase.
 class DefaultFirebaseOptions {
+  /// Mengambil konfigurasi Firebase yang sesuai dengan platform saat ini.
+  ///
+  /// Nilai ini digunakan saat Firebase diinisialisasi.
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       return web;
