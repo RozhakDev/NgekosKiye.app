@@ -28,7 +28,13 @@ class BookingHistoryScreen extends ConsumerWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
         ),
         title: const Text(
           'Riwayat Pemesanan',
@@ -43,7 +49,11 @@ class BookingHistoryScreen extends ConsumerWidget {
       body: historyAsync.when(
         data: (bookings) {
           if (bookings.isEmpty) {
-            return const Center(child: Text('Belum ada riwayat pemesanan.'));
+            return CustomEmptyState(
+              message: 'Belum ada riwayat pemesanan.',
+              icon: Icons.receipt_long_outlined,
+              onRetry: () => ref.refresh(bookingHistoryProvider.future),
+            );
           }
           return RefreshIndicator(
             color: AppColors.primary,

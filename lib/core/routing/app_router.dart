@@ -11,6 +11,7 @@ import '../../features/auth/presentation/screens/reset_password_screen.dart';
 
 import '../../features/kost/presentation/screens/dashboard_screen.dart';
 import '../../features/kost/presentation/screens/kost_detail_screen.dart';
+import '../../features/kost/presentation/screens/room_detail_screen.dart';
 import '../../features/kost/presentation/screens/kost_map_screen.dart';
 import '../../features/kost/presentation/screens/search_screen.dart';
 
@@ -73,6 +74,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           return KostDetailScreen(id: id);
+        },
+      ),
+      GoRoute(
+        path: '/room/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return RoomDetailScreen(id: id);
         },
       ),
       GoRoute(

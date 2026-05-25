@@ -32,4 +32,8 @@ class KostRepository {
   Future<Response> getKostDetail(int id) async {
     return await _dio.get('/kosts/$id/');
   }
+
+  Future<Response> getRoomDetail(int id) async {
+    return await _dio.get('/rooms/$id/');
+  }
 }

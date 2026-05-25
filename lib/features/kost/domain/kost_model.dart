@@ -56,16 +56,20 @@ class KostModel {
 /// Model ini digunakan untuk menampilkan pilihan kamar dan harga sewa.
 class RoomModel {
   final int id;
+  final int kostId;
   final String roomNumber;
   final String price;
   final String status;
+  final String description;
   final List<String> images;
 
   RoomModel({
     required this.id, 
+    required this.kostId,
     required this.roomNumber, 
     required this.price, 
     required this.status,
+    required this.description,
     required this.images,
   });
 
@@ -78,9 +82,11 @@ class RoomModel {
 
     return RoomModel(
       id: json['id'] ?? 0,
+      kostId: json['kost'] ?? 0,
       roomNumber: json['room_number'] ?? '',
       price: json['price']?.toString() ?? '0',
       status: json['status'] ?? 'available',
+      description: json['description'] ?? '',
       images: imageUrls,
     );
   }

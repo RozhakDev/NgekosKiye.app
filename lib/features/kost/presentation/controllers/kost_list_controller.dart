@@ -89,3 +89,9 @@ final kostDetailProvider = FutureProvider.family<KostModel, int>((ref, id) async
   final res = await repo.getKostDetail(id);
   return KostModel.fromJson(res.data);
 });
+
+final roomDetailProvider = FutureProvider.family<RoomModel, int>((ref, id) async {
+  final repo = ref.watch(kostRepositoryProvider);
+  final res = await repo.getRoomDetail(id);
+  return RoomModel.fromJson(res.data);
+});

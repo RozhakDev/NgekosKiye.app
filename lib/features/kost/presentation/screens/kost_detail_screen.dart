@@ -427,92 +427,86 @@ class _RoomsSelectionSliver extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final room = rooms[index];
                   final isAvailable = room.status == 'available';
-                  final isSelected = selectedId == room.id;
 
-                  return GestureDetector(
-                    onTap: isAvailable ? () {
-                      if (isSelected) {
-                        ref.read(selectedRoomIdProvider.notifier).state = null;
-                      } else {
-                        ref.read(selectedRoomIdProvider.notifier).state = room.id;
-                      }
-                    } : null,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.border,
-                          width: isSelected ? 2 : 1,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _RoomImageCarousel(images: room.images),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              'Kamar ${room.roomNumber}',
-                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                                            ),
-                                          ),
-                                          if (!isAvailable)
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.error,
-                                                borderRadius: BorderRadius.circular(4),
-                                              ),
-                                              child: const Text('Penuh', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                                            ),
-                                        ],
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.border),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _RoomImageCarousel(images: room.images),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Kamar ${room.roomNumber}',
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                                       ),
-                                      const SizedBox(height: 16),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          RichText(
-                                            text: TextSpan(
-                                              text: CurrencyFormatter.toIDR(room.price),
-                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
-                                              children: const [
-                                                TextSpan(
-                                                  text: '/bln',
-                                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: AppColors.textSecondary),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          if (isAvailable)
-                                            Icon(
-                                              isSelected ? Icons.check_circle : Icons.add_circle_outline,
-                                              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                                              size: 24,
-                                            ),
-                                        ],
+                                    ),
+                                    if (!isAvailable)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.error,
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: const Text('Penuh', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                                       ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    RichText(
+                                      text: TextSpan(
+                                        text: CurrencyFormatter.toIDR(room.price),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                        children: const [
+                                          TextSpan(
+                                            text: '/bln',
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: AppColors.textSecondary),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () => context.push('/room/${room.id}'),
+                                        borderRadius: BorderRadius.circular(24),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: AppColors.textSecondary.withValues(alpha: 0.5)),
+                                          ),
+                                          child: const Icon(
+                                            Icons.add,
+                                            color: AppColors.textPrimary,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          if (isSelected) const InlineBookingForm(),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   );
                 },
