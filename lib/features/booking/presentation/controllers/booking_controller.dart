@@ -5,6 +5,37 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import '../../data/booking_repository.dart';
 import '../../domain/booking_models.dart';
+import '../../../../core/network/dio_client.dart';
+import '../../../kost/domain/kost_model.dart';
+
+final roomForBookingProvider = FutureProvider.family<RoomModel, int>((ref, bookingId) async {
+  final dio = ref.watch(dioProvider);
+  final bookingRes = await dio.get('/bookings/$bookingId/');
+  final roomId = bookingRes.data['room'];
+  final roomRes = await dio.get('/rooms/$roomId/');
+  return RoomModel.fromJson(roomRes.data);
+});
+
+final paymentMethodsForBookingProvider = FutureProvider.family<List<PaymentMethodModel>, int>((ref, bookingId) async {
+  final dio = ref.watch(dioProvider);
+  
+  final bookingRes = await dio.get('/bookings/$bookingId/');
+  final roomId = bookingRes.data['room'];
+  
+  final roomRes = await dio.get('/rooms/$roomId/');
+  final kostId = roomRes.data['kost'];
+  
+  final methodsRes = await dio.get('/kosts/$kostId/payment-methods/');
+  
+  List<dynamic> rawData;
+  if (methodsRes.data is Map<String, dynamic> && (methodsRes.data as Map<String, dynamic>).containsKey('results')) {
+    rawData = methodsRes.data['results'] as List<dynamic>;
+  } else {
+    rawData = methodsRes.data as List<dynamic>;
+  }
+  
+  return rawData.map((e) => PaymentMethodModel.fromJson(e)).toList();
+});
 
 final paymentMethodsProvider = FutureProvider.family<List<PaymentMethodModel>, int>((ref, kostId) async {
   final repo = ref.watch(bookingRepositoryProvider);

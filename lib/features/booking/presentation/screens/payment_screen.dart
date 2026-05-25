@@ -82,7 +82,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
   @override
   Widget build(BuildContext context) {
-    final paymentMethodsAsync = ref.watch(paymentMethodsProvider(widget.kostId));
+    final paymentMethodsAsync = ref.watch(paymentMethodsForBookingProvider(widget.bookingId));
+    final roomAsync = ref.watch(roomForBookingProvider(widget.bookingId));
     final isLoading = ref.watch(bookingControllerProvider).isLoading;
 
     return Scaffold(
@@ -121,7 +122,20 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                               color: const Color(0xFFEEEEEE),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(Icons.bed, color: Colors.grey, size: 32),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: roomAsync.when(
+                                data: (room) => room.images.isNotEmpty
+                                    ? Image.network(
+                                        room.images.first,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.grey),
+                                      )
+                                    : const Icon(Icons.bed, color: Colors.grey, size: 32),
+                                loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                error: (_, __) => const Icon(Icons.error_outline, color: Colors.grey),
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -130,7 +144,11 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                               children: [
                                 const Text('TIPE KAMAR', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textSecondary, letterSpacing: 1.0)),
                                 const SizedBox(height: 4),
-                                const Text('Kamar Pilihan Anda', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                                roomAsync.when(
+                                  data: (room) => Text('Kamar ${room.roomNumber}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                                  loading: () => const Text('Memuat...', style: TextStyle(color: AppColors.textSecondary)),
+                                  error: (_, __) => const Text('Error', style: TextStyle(color: AppColors.error)),
+                                ),
                                 const SizedBox(height: 8),
                                 Text(
                                   CurrencyFormatter.toIDR(widget.totalPrice),
