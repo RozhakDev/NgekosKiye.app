@@ -10,6 +10,7 @@ import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/custom_empty_state.dart';
 import '../widgets/home_search_bar.dart';
 import '../widgets/home_drawer.dart';
+import '../widgets/animated_promo_slider.dart';
 
 /// Menampilkan halaman utama berisi daftar dan rekomendasi kos.
 ///
@@ -126,7 +127,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         const HomeSearchBarSliver(),
-        const _PromoSliderSliver(),
+        const AnimatedPromoSlider(),
         const _PopularLocationsSliver(),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
         const _SectionTitleSliver(title: 'Kost Terbaru', actionText: 'LIHAT SEMUA'),
@@ -223,93 +224,6 @@ class _DashboardBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Riwayat'),
         BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profil'),
       ],
-    );
-  }
-}
-
-/// Menampilkan daftar promo dalam bentuk sliver horizontal.
-///
-/// Widget ini memberi sorotan visual pada konten promosi.
-class _PromoSliderSliver extends StatelessWidget {
-  const _PromoSliderSliver();
-
-  /// Membangun tampilan widget berdasarkan state yang tersedia.
-  ///
-  /// Digunakan untuk menyusun elemen UI sesuai data yang diterima.
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Container(
-        height: 140,
-        margin: const EdgeInsets.only(top: 8, bottom: 8),
-        child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          scrollDirection: Axis.horizontal,
-          itemCount: 3,
-          separatorBuilder: (_, __) => const SizedBox(width: 12),
-          itemBuilder: (context, index) {
-            final colors = [AppColors.primary, AppColors.secondary, Colors.teal];
-            final titles = ['Diskon 25%', 'Cashback 15%', 'Hemat 20%'];
-            final badges = ['Pengguna Baru', 'Promo Spesial', 'Terbatas'];
-            final subtitles = [
-              'Untuk pemesanan bulan pertama',
-              'Minimal transaksi Rp 500rb',
-              'Khusus kost area Banyumas'
-            ];
-
-            return Container(
-              width: MediaQuery.of(context).size.width - 34,
-              decoration: BoxDecoration(
-                color: colors[index],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    right: -20,
-                    bottom: -20,
-                    child: Icon(
-                      Icons.local_offer,
-                      size: 100,
-                      color: Colors.white.withOpacity(0.15),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            badges[index],
-                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          titles[index],
-                          style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.1),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitles[index],
-                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 }
