@@ -10,7 +10,7 @@ import '../../domain/kost_model.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../widgets/inline_booking_form.dart';
+import '../../../../core/routing/app_router.dart';
 
 /// Menyimpan tanggal mulai sewa yang dipilih pengguna.
 ///
@@ -423,6 +423,17 @@ class _RoomStickyBottomBar extends ConsumerWidget {
             const SizedBox(width: 16),
             ElevatedButton(
               onPressed: (!isAvailable || isLoading) ? null : () async {
+                final isLoggedIn = ref.read(authStateProvider);
+                if (!isLoggedIn) {
+                  NotificationUtils.show(
+                    context,
+                    message: 'Silakan masuk terlebih dahulu untuk melakukan pemesanan.',
+                    type: SnackBarType.info,
+                  );
+                  context.push('/login');
+                  return;
+                }
+
                 if (startDate == null) {
                   NotificationUtils.show(context, message: 'Pilih tanggal mulai terlebih dahulu.', type: SnackBarType.error);
                   return;
